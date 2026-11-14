@@ -496,7 +496,7 @@ export default function VVIPVoiceChatApp() {
     };
 
     return (
-        <div className="flex h-screen w-screen overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950/90 to-slate-900 text-slate-100">
+        <div className="flex h-screen w-screen overflow-hidden bg-linear-to-br from-slate-900 via-indigo-950/90 to-slate-900 text-slate-100">
             {/* Smoothly Animated Left Sidebar */}
             <Sidebar
                 isOpen={isSidebarOpen}
