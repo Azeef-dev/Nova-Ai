@@ -54,7 +54,7 @@ export default function MessageList({
             <div className="max-w-4xl mx-auto space-y-6">
                 {messages.length === 0 ? (
                     <div className="min-h-[65vh] flex flex-col items-center justify-center text-center py-8">
-                        <div className="w-16 h-16 rounded-3xl bg-gradient-to-tr from-indigo-500/25 to-violet-500/25 border border-indigo-400/30 flex items-center justify-center mb-5 shadow-xl shadow-indigo-950/50">
+                        <div className="w-16 h-16 rounded-3xl bg-linear-to-tr from-indigo-500/25 to-violet-500/25 border border-indigo-400/30 flex items-center justify-center mb-5 shadow-xl shadow-indigo-950/50">
                             <Bot className="w-8 h-8 text-indigo-300" />
                         </div>
                         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 mb-3">
@@ -120,7 +120,7 @@ export default function MessageList({
 
                                 <div
                                     className={`group relative max-w-[85%] sm:max-w-[75%] rounded-2xl px-5 py-3.5 text-sm leading-relaxed shadow-lg ${msg.role === "user"
-                                            ? "rounded-tr-sm bg-gradient-to-br from-indigo-600 to-violet-600 text-white"
+                                            ? "rounded-tr-sm bg-linear-to-br from-indigo-600 to-violet-600 text-white"
                                             : "rounded-tl-sm border border-slate-700/80 bg-slate-800/90 text-slate-100"
                                         }`}
                                 >
