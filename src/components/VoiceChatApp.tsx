@@ -671,14 +671,14 @@ export default function VVIPVoiceChatApp() {
                                             key={persona.id}
                                             onClick={() => setSelectedPersona(persona)}
                                             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition cursor-pointer ${active
-                                                    ? "bg-indigo-600/25 border border-indigo-500/40 text-white shadow-sm"
-                                                    : "hover:bg-slate-800/60 text-slate-300 border border-transparent"
+                                                ? "bg-indigo-600/25 border border-indigo-500/40 text-white shadow-sm"
+                                                : "hover:bg-slate-800/60 text-slate-300 border border-transparent"
                                                 }`}
                                         >
                                             <div
                                                 className={`p-2 rounded-lg ${active
-                                                        ? "bg-indigo-500 text-white"
-                                                        : "bg-slate-800 text-indigo-400"
+                                                    ? "bg-indigo-500 text-white"
+                                                    : "bg-slate-800 text-indigo-400"
                                                     }`}
                                             >
                                                 <Icon className="w-4 h-4" />
@@ -774,8 +774,8 @@ export default function VVIPVoiceChatApp() {
                                                 setOpenDropdown(null);
                                             }}
                                             className={`w-full flex items-start justify-between p-2.5 rounded-xl text-left transition cursor-pointer ${selectedModel.id === model.id
-                                                    ? "bg-indigo-600/25 border border-indigo-500/40 text-white"
-                                                    : "hover:bg-slate-800/80 text-slate-300"
+                                                ? "bg-indigo-600/25 border border-indigo-500/40 text-white"
+                                                : "hover:bg-slate-800/80 text-slate-300"
                                                 }`}
                                         >
                                             <div>
@@ -829,8 +829,8 @@ export default function VVIPVoiceChatApp() {
                                                     setOpenDropdown(null);
                                                 }}
                                                 className={`w-full flex items-start gap-3 p-2.5 rounded-xl text-left transition cursor-pointer ${selectedPersona.id === persona.id
-                                                        ? "bg-indigo-600/25 border border-indigo-500/40 text-white"
-                                                        : "hover:bg-slate-800/80 text-slate-300"
+                                                    ? "bg-indigo-600/25 border border-indigo-500/40 text-white"
+                                                    : "hover:bg-slate-800/80 text-slate-300"
                                                     }`}
                                             >
                                                 <div className="p-2 rounded-lg bg-slate-800 text-indigo-400 shrink-0">
@@ -881,8 +881,8 @@ export default function VVIPVoiceChatApp() {
                                                 setOpenDropdown(null);
                                             }}
                                             className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition cursor-pointer ${selectedLanguage.id === lang.id
-                                                    ? "bg-indigo-600/25 border border-indigo-500/40 text-white font-semibold"
-                                                    : "hover:bg-slate-800/80 text-slate-300"
+                                                ? "bg-indigo-600/25 border border-indigo-500/40 text-white font-semibold"
+                                                : "hover:bg-slate-800/80 text-slate-300"
                                                 }`}
                                         >
                                             <div className="flex items-center gap-2">
@@ -907,12 +907,12 @@ export default function VVIPVoiceChatApp() {
                         <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800/60 border border-slate-700/60 text-xs text-slate-300">
                             <span
                                 className={`w-2 h-2 rounded-full ${status === "idle"
-                                        ? "bg-emerald-400"
-                                        : status === "listening"
-                                            ? "bg-emerald-400 animate-ping"
-                                            : status === "thinking"
-                                                ? "bg-amber-400 animate-pulse"
-                                                : "bg-indigo-400 animate-ping"
+                                    ? "bg-emerald-400"
+                                    : status === "listening"
+                                        ? "bg-emerald-400 animate-ping"
+                                        : status === "thinking"
+                                            ? "bg-amber-400 animate-pulse"
+                                            : "bg-indigo-400 animate-ping"
                                     }`}
                             />
                             <span className="capitalize font-medium">{status}</span>
@@ -958,8 +958,8 @@ export default function VVIPVoiceChatApp() {
                                                 key={rate.value}
                                                 onClick={() => setSpeechRate(rate.value)}
                                                 className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer flex items-center justify-between ${speechRate === rate.value
-                                                        ? "bg-indigo-600 text-white"
-                                                        : "bg-slate-800/80 text-slate-300 hover:bg-slate-700"
+                                                    ? "bg-indigo-600 text-white"
+                                                    : "bg-slate-800/80 text-slate-300 hover:bg-slate-700"
                                                     }`}
                                             >
                                                 <span>{rate.label}</span>
@@ -980,8 +980,8 @@ export default function VVIPVoiceChatApp() {
                                         </span>
                                         <span
                                             className={`px-2 py-0.5 rounded-md text-[10px] font-semibold ${autoSpeakChat
-                                                    ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
-                                                    : "bg-slate-800 text-slate-400"
+                                                ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                                                : "bg-slate-800 text-slate-400"
                                                 }`}
                                         >
                                             {autoSpeakChat ? "ON" : "OFF"}
@@ -1131,16 +1131,16 @@ export default function VVIPVoiceChatApp() {
 
                                         <div
                                             className={`group relative max-w-[85%] sm:max-w-[75%] rounded-2xl px-5 py-3.5 text-sm leading-relaxed shadow-lg ${msg.role === "user"
-                                                    ? "rounded-tr-sm bg-gradient-to-br from-indigo-600 to-violet-600 text-white"
-                                                    : "rounded-tl-sm border border-slate-700/80 bg-slate-800/90 text-slate-100"
+                                                ? "rounded-tr-sm bg-gradient-to-br from-indigo-600 to-violet-600 text-white"
+                                                : "rounded-tl-sm border border-slate-700/80 bg-slate-800/90 text-slate-100"
                                                 }`}
                                         >
                                             <p className="whitespace-pre-wrap">{msg.content}</p>
 
                                             <div
                                                 className={`mt-2.5 pt-2 border-t flex flex-wrap items-center justify-between gap-3 text-[11px] ${msg.role === "user"
-                                                        ? "border-indigo-400/30 text-indigo-100"
-                                                        : "border-slate-700/70 text-slate-400"
+                                                    ? "border-indigo-400/30 text-indigo-100"
+                                                    : "border-slate-700/70 text-slate-400"
                                                     }`}
                                             >
                                                 <div className="flex items-center gap-2">
@@ -1237,8 +1237,8 @@ export default function VVIPVoiceChatApp() {
                             onClick={toggleDictation}
                             title={isDictating ? "Stop Voice Dictation" : "Dictate with Microphone"}
                             className={`p-3.5 rounded-2xl border transition cursor-pointer ${isDictating
-                                    ? "bg-rose-500/20 border-rose-500 text-rose-400 animate-pulse"
-                                    : "bg-slate-800/90 hover:bg-slate-800 border-slate-700 text-slate-300 hover:text-white"
+                                ? "bg-rose-500/20 border-rose-500 text-rose-400 animate-pulse"
+                                : "bg-slate-800/90 hover:bg-slate-800 border-slate-700 text-slate-300 hover:text-white"
                                 }`}
                         >
                             {isDictating ? (
