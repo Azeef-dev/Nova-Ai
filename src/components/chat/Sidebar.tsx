@@ -57,7 +57,7 @@ export default function Sidebar({
                         {/* Brand Identity */}
                         <div className="flex items-center justify-between px-2 pt-1">
                             <div className="flex items-center gap-3">
-                                <div className="relative flex items-center justify-center w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-violet-600 to-purple-500 shadow-lg shadow-indigo-500/30 border border-indigo-400/30">
+                                <div className="relative flex items-center justify-center w-10 h-10 rounded-2xl bg-linear-to-tr from-indigo-600 via-violet-600 to-purple-500 shadow-lg shadow-indigo-500/30 border border-indigo-400/30">
                                     <Sparkles className="w-5 h-5 text-white" />
                                 </div>
                                 <div>
@@ -87,7 +87,7 @@ export default function Sidebar({
                         {/* New Session Button */}
                         <button
                             onClick={onClearChat}
-                            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/25 transition cursor-pointer"
+                            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-linear-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/25 transition cursor-pointer"
                         >
                             <MessageSquarePlus className="w-4 h-4" />
                             <span>Start New Conversation</span>
