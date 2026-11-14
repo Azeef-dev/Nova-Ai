@@ -20,7 +20,7 @@ import VoiceCallBanner from "@/components/chat/VoiceCallBanner";
 import MessageList from "@/components/chat/MessageList";
 import ChatComposer from "@/components/chat/ChatComposer";
 
-export default function VVIPVoiceChatApp() {
+export default function VoiceChatApp() {
     const [models, setModels] = useState<ModelOption[]>(DEFAULT_FREE_MODELS);
     const [messages, setMessages] = useState<Message[]>([]);
     const [inputText, setInputText] = useState("");
@@ -497,7 +497,6 @@ export default function VVIPVoiceChatApp() {
 
     return (
         <div className="flex h-screen w-screen overflow-hidden bg-linear-to-br from-slate-900 via-indigo-950/90 to-slate-900 text-slate-100">
-            {/* Smoothly Animated Left Sidebar */}
             <Sidebar
                 isOpen={isSidebarOpen}
                 onClose={() => setIsSidebarOpen(false)}
