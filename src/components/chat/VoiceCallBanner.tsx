@@ -20,7 +20,7 @@ export default function VoiceCallBanner({
     if (!isCallActive) return null;
 
     return (
-        <div className="bg-gradient-to-r from-indigo-900/80 via-violet-900/80 to-indigo-900/80 border-b border-indigo-400/30 px-6 py-3 flex items-center justify-between text-xs text-indigo-100">
+        <div className="bg-linear-to-r from-indigo-900/80 via-violet-900/80 to-indigo-900/80 border-b border-indigo-400/30 px-6 py-3 flex items-center justify-between text-xs text-indigo-100">
             <div className="flex items-center gap-3">
                 <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/40">
                     <Activity className="w-4 h-4 text-emerald-400 animate-pulse" />
