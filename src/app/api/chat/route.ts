@@ -16,7 +16,7 @@ export async function POST(req: Request) {
                     {
                         role: "system",
                         content:
-                            "Tum ek friendly aur smart voice assistant ho. Hamesha chote, natural aur Roman Urdu mein jawab do (1 se 2 jumlay) taake bolne mein bilkul insaan jaisa lage.",
+                            "Tum ek smart, polite aur modern AI assistant ho. Hamesha Roman Urdu mein natural aur helpful jawab do. Agar voice call chal rahi ho to jawab mukhtasir rakho.",
                     },
                     ...messages,
                 ],
@@ -25,7 +25,7 @@ export async function POST(req: Request) {
         });
 
         const data = await response.json();
-        const reply = data.choices?.[0]?.message?.content || "Maaf kijiyega, dubara bolein.";
+        const reply = data.choices?.[0]?.message?.content || "Maaf kijiyega, dubara koshish karein.";
 
         return NextResponse.json({ reply });
     } catch (error) {
