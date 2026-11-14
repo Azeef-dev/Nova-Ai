@@ -60,7 +60,7 @@ export default function ChatComposer({
                 <button
                     type="submit"
                     disabled={!inputText.trim() || status === "thinking"}
-                    className="cursor-pointer rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 px-6 py-3.5 text-white font-semibold text-sm shadow-lg shadow-indigo-600/30 transition hover:from-indigo-500 hover:to-violet-500 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+                    className="cursor-pointer rounded-2xl bg-linear-to-r from-indigo-600 to-violet-600 px-6 py-3.5 text-white font-semibold text-sm shadow-lg shadow-indigo-600/30 transition hover:from-indigo-500 hover:to-violet-500 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
                     aria-label="Send message"
                 >
                     <Send className="h-4 w-4" />
