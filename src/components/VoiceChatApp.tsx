@@ -572,11 +572,11 @@ export default function VoiceChatApp() {
             {/* Top Header & Navigation */}
             <div
                 ref={headerRef}
-                className="relative z-30 flex flex-col gap-3 px-5 py-3.5 bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950/90 border-b border-slate-800/90"
+                className="relative z-30 flex flex-col gap-3 px-5 py-3.5 bg-linear-to-r from-slate-950 via-slate-900 to-indigo-950/90 border-b border-slate-800/90"
             >
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="flex items-center gap-3.5">
-                        <div className="relative flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-violet-600 to-purple-500 shadow-lg shadow-indigo-500/30 border border-indigo-400/30">
+                        <div className="relative flex items-center justify-center w-11 h-11 rounded-2xl bg-linear-to-tr from-indigo-600 via-violet-600 to-purple-500 shadow-lg shadow-indigo-500/30 border border-indigo-400/30">
                             <Sparkles className="w-5 h-5 text-white" />
                             <span
                                 className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-slate-950 ${isCallActive
@@ -733,7 +733,7 @@ export default function VoiceChatApp() {
                         {!isCallActive ? (
                             <button
                                 onClick={startCall}
-                                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white text-xs font-semibold shadow-lg shadow-emerald-600/25 transition cursor-pointer"
+                                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-linear-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white text-xs font-semibold shadow-lg shadow-emerald-600/25 transition cursor-pointer"
                             >
                                 <Phone className="w-4 h-4" />
                                 <span>Start Voice Call</span>
@@ -741,7 +741,7 @@ export default function VoiceChatApp() {
                         ) : (
                             <button
                                 onClick={endCall}
-                                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-400 hover:to-red-500 text-white text-xs font-semibold shadow-lg shadow-rose-600/30 animate-pulse transition cursor-pointer"
+                                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-linear-to-r from-rose-500 to-red-600 hover:from-rose-400 hover:to-red-500 text-white text-xs font-semibold shadow-lg shadow-rose-600/30 animate-pulse transition cursor-pointer"
                             >
                                 <PhoneOff className="w-4 h-4" />
                                 <span>End Call</span>
@@ -924,7 +924,7 @@ export default function VoiceChatApp() {
 
             {/* Live Voice Call Banner */}
             {isCallActive && (
-                <div className="bg-gradient-to-r from-indigo-950/90 via-violet-950/90 to-indigo-950/90 border-b border-indigo-500/30 px-6 py-3 flex items-center justify-between text-xs text-indigo-100">
+                <div className="bg-linear-to-r from-indigo-950/90 via-violet-950/90 to-indigo-950/90 border-b border-indigo-500/30 px-6 py-3 flex items-center justify-between text-xs text-indigo-100">
                     <div className="flex items-center gap-3">
                         <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/40">
                             <Activity className="w-4 h-4 text-emerald-400 animate-pulse" />
@@ -963,7 +963,7 @@ export default function VoiceChatApp() {
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
                 {messages.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center text-center max-w-2xl mx-auto py-6">
-                        <div className="w-16 h-16 rounded-3xl bg-gradient-to-tr from-indigo-500/20 to-violet-500/20 border border-indigo-500/30 flex items-center justify-center mb-4 shadow-inner">
+                        <div className="w-16 h-16 rounded-3xl bg-linear-to-tr from-indigo-500/20 to-violet-500/20 border border-indigo-500/30 flex items-center justify-center mb-4 shadow-inner">
                             <Bot className="w-8 h-8 text-indigo-400" />
                         </div>
                         <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
@@ -1018,7 +1018,7 @@ export default function VoiceChatApp() {
 
                                 <div
                                     className={`group relative max-w-[82%] sm:max-w-[75%] rounded-2xl px-4 py-3.5 text-sm leading-relaxed shadow-md ${msg.role === "user"
-                                        ? "rounded-tr-sm bg-gradient-to-br from-indigo-600 to-violet-600 text-white"
+                                        ? "rounded-tr-sm bg-linear-to-br from-indigo-600 to-violet-600 text-white"
                                         : "rounded-tl-sm border border-slate-700/80 bg-slate-800/90 text-slate-100"
                                         }`}
                                 >
@@ -1138,7 +1138,7 @@ export default function VoiceChatApp() {
                 <button
                     type="submit"
                     disabled={!inputText.trim() || status === "thinking"}
-                    className="cursor-pointer rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 px-5 py-3.5 text-white font-medium text-sm shadow-lg shadow-indigo-600/30 transition hover:from-indigo-500 hover:to-violet-500 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+                    className="cursor-pointer rounded-2xl bg-linear-to-r from-indigo-600 to-violet-600 px-5 py-3.5 text-white font-medium text-sm shadow-lg shadow-indigo-600/30 transition hover:from-indigo-500 hover:to-violet-500 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
                     aria-label="Send message"
                 >
                     <Send className="h-4 w-4" />
