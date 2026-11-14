@@ -4,6 +4,12 @@ export type ChatStatus = "idle" | "listening" | "thinking" | "speaking";
 
 export type DropdownType = "model" | "persona" | "language" | "settings" | null;
 
+export type UserProfile = {
+    id: string;
+    name: string;
+    email: string;
+};
+
 export type Message = {
     id: string;
     role: "user" | "assistant";
@@ -11,6 +17,16 @@ export type Message = {
     time: string;
     model?: string;
     latency?: string;
+};
+
+export type ChatSessionItem = {
+    _id: string;
+    title: string;
+    persona: string;
+    model: string;
+    language: string;
+    messages: Message[];
+    updatedAt: string;
 };
 
 export type ModelOption = {
