@@ -23,7 +23,7 @@ type Message = {
     time: string;
 };
 
-export default function VVIPVoiceChatApp() {
+export default function VoiceChatApp() {
     const [messages, setMessages] = useState<Message[]>([]);
     const [inputText, setInputText] = useState("");
     const [isCallActive, setIsCallActive] = useState(false);
