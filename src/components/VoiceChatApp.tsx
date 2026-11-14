@@ -168,7 +168,7 @@ const QUICK_PROMPTS = [
     },
 ];
 
-export default function VVIPVoiceChatApp() {
+export default function VoiceChatApp() {
     const [models, setModels] = useState<ModelOption[]>(DEFAULT_FREE_MODELS);
     const [messages, setMessages] = useState<Message[]>([]);
     const [inputText, setInputText] = useState("");
