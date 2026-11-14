@@ -120,16 +120,16 @@ export default function MessageList({
 
                                 <div
                                     className={`group relative max-w-[85%] sm:max-w-[75%] rounded-2xl px-5 py-3.5 text-sm leading-relaxed shadow-lg ${msg.role === "user"
-                                            ? "rounded-tr-sm bg-linear-to-br from-indigo-600 to-violet-600 text-white"
-                                            : "rounded-tl-sm border border-slate-700/80 bg-slate-800/90 text-slate-100"
+                                        ? "rounded-tr-sm bg-linear-to-br from-indigo-600 to-violet-600 text-white"
+                                        : "rounded-tl-sm border border-slate-700/80 bg-slate-800/90 text-slate-100"
                                         }`}
                                 >
                                     <p className="whitespace-pre-wrap">{msg.content}</p>
 
                                     <div
                                         className={`mt-2.5 pt-2 border-t flex flex-wrap items-center justify-between gap-3 text-[11px] ${msg.role === "user"
-                                                ? "border-indigo-400/30 text-indigo-100"
-                                                : "border-slate-700/70 text-slate-400"
+                                            ? "border-indigo-400/30 text-indigo-100"
+                                            : "border-slate-700/70 text-slate-400"
                                             }`}
                                     >
                                         <div className="flex items-center gap-2">
