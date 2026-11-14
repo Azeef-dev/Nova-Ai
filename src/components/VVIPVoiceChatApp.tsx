@@ -259,9 +259,9 @@ export default function VVIPVoiceChatApp() {
     return (
         <div className="flex flex-col h-[92vh] max-w-2xl w-full mx-auto bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl shadow-2xl shadow-indigo-950/50 overflow-hidden">
             {/* VVIP Top Header */}
-            <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-indigo-950/90 via-slate-900 to-purple-950/90 border-b border-slate-800">
+            <div className="flex items-center justify-between px-6 py-4 bg-linear-to-r from-indigo-950/90 via-slate-900 to-purple-950/90 border-b border-slate-800">
                 <div className="flex items-center gap-3">
-                    <div className="relative flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 shadow-lg shadow-indigo-500/30">
+                    <div className="relative flex items-center justify-center w-11 h-11 rounded-2xl bg-linear-to-tr from-indigo-600 to-violet-500 shadow-lg shadow-indigo-500/30">
                         <Sparkles className="w-5 h-5 text-white" />
                         <span
                             className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-slate-900 ${isCallActive ? "bg-emerald-400 animate-pulse" : "bg-indigo-400"
@@ -306,7 +306,7 @@ export default function VVIPVoiceChatApp() {
                     {!isCallActive ? (
                         <button
                             onClick={startCall}
-                            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-semibold shadow-lg shadow-emerald-600/25 transition cursor-pointer"
+                            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-linear-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-semibold shadow-lg shadow-emerald-600/25 transition cursor-pointer"
                         >
                             <Phone className="w-4 h-4" />
                             <span>Voice Call</span>
@@ -314,7 +314,7 @@ export default function VVIPVoiceChatApp() {
                     ) : (
                         <button
                             onClick={endCall}
-                            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 text-white text-xs font-semibold shadow-lg shadow-rose-600/30 animate-pulse transition cursor-pointer"
+                            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-linear-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 text-white text-xs font-semibold shadow-lg shadow-rose-600/30 animate-pulse transition cursor-pointer"
                         >
                             <PhoneOff className="w-4 h-4" />
                             <span>End Call</span>
@@ -364,8 +364,8 @@ export default function VVIPVoiceChatApp() {
                             )}
                             <div
                                 className={`group relative max-w-[78%] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-md ${msg.role === "user"
-                                        ? "rounded-br-sm bg-gradient-to-br from-indigo-600 to-violet-600 text-white"
-                                        : "rounded-bl-sm border border-slate-700/70 bg-slate-800/90 text-slate-100"
+                                    ? "rounded-br-sm bg-linear-to-br from-indigo-600 to-violet-600 text-white"
+                                    : "rounded-bl-sm border border-slate-700/70 bg-slate-800/90 text-slate-100"
                                     }`}
                             >
                                 <p className="whitespace-pre-wrap">{msg.content}</p>
@@ -422,7 +422,7 @@ export default function VVIPVoiceChatApp() {
                 <button
                     type="submit"
                     disabled={!inputText.trim() || status === "thinking"}
-                    className="cursor-pointer rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 p-3.5 text-white shadow-lg shadow-indigo-600/30 transition hover:from-indigo-500 hover:to-violet-500 disabled:opacity-40"
+                    className="cursor-pointer rounded-2xl bg-linear-to-r from-indigo-600 to-violet-600 p-3.5 text-white shadow-lg shadow-indigo-600/30 transition hover:from-indigo-500 hover:to-violet-500 disabled:opacity-40"
                     aria-label="Send message"
                 >
                     <Send className="h-5 w-5" />
