@@ -75,7 +75,7 @@ export default function AuthModal({
                 </button>
 
                 <div className="flex items-center gap-3 mb-5">
-                    <div className="flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 shadow-lg shadow-indigo-500/30">
+                    <div className="flex items-center justify-center w-11 h-11 rounded-2xl bg-linear-to-tr from-indigo-600 to-violet-500 shadow-lg shadow-indigo-500/30">
                         <Sparkles className="w-5 h-5 text-white" />
                     </div>
                     <div>
