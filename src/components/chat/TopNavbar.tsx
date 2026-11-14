@@ -392,7 +392,7 @@ export default function TopNavbar({
                 {!isCallActive ? (
                     <button
                         onClick={onStartCall}
-                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white text-xs font-semibold shadow-lg shadow-emerald-600/25 transition cursor-pointer"
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-linear-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white text-xs font-semibold shadow-lg shadow-emerald-600/25 transition cursor-pointer"
                     >
                         <Phone className="w-4 h-4" />
                         <span>Start Voice Call</span>
@@ -400,7 +400,7 @@ export default function TopNavbar({
                 ) : (
                     <button
                         onClick={onEndCall}
-                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-400 hover:to-red-500 text-white text-xs font-semibold shadow-lg shadow-rose-600/30 animate-pulse transition cursor-pointer"
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-linear-to-r from-rose-500 to-red-600 hover:from-rose-400 hover:to-red-500 text-white text-xs font-semibold shadow-lg shadow-rose-600/30 animate-pulse transition cursor-pointer"
                     >
                         <PhoneOff className="w-4 h-4" />
                         <span>End Call</span>
