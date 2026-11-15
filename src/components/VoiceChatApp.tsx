@@ -750,7 +750,7 @@ export default function VoiceChatApp() {
     };
 
     return (
-        <div className="relative flex h-screen w-screen overflow-hidden bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 text-slate-100">
+        <div className="relative flex h-screen w-screen overflow-hidden bg-linear-to-br from-slate-950 via-indigo-950 to-slate-900 text-slate-100">
             {/* Ambient Background Glow */}
             <div className="pointer-events-none fixed inset-0 overflow-hidden z-0">
                 <div className="absolute -top-40 -left-40 w-96 h-96 bg-indigo-600/20 rounded-full blur-[120px]" />
