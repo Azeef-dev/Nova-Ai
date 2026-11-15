@@ -83,16 +83,16 @@ export default function SignupPage() {
     };
 
     return (
-        <div className="h-screen w-screen overflow-y-auto bg-linear-to-br from-slate-950 via-indigo-950 to-slate-900 text-slate-100 flex items-center justify-center p-4 relative">
+        <div className="min-h-screen w-full overflow-y-auto bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 text-slate-100 flex items-center justify-center p-4 sm:p-6 relative">
             {/* Ambient Glow */}
             <div className="pointer-events-none fixed inset-0 overflow-hidden z-0">
-                <div className="absolute -top-40 -right-40 w-96 h-96 bg-indigo-600/20 rounded-full blur-[130px]" />
-                <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-purple-600/20 rounded-full blur-[130px]" />
+                <div className="absolute -top-40 -right-40 w-80 sm:w-96 h-80 sm:h-96 bg-indigo-600/20 rounded-full blur-[130px]" />
+                <div className="absolute -bottom-40 -left-40 w-80 sm:w-96 h-80 sm:h-96 bg-purple-600/20 rounded-full blur-[130px]" />
             </div>
 
-            <div className="relative z-10 w-full max-w-4xl grid grid-cols-1 lg:grid-cols-12 bg-slate-900/80 backdrop-blur-2xl border border-indigo-500/25 rounded-3xl shadow-[0_25px_70px_rgba(0,0,0,0.75)] overflow-hidden">
+            <div className="relative z-10 w-full max-w-4xl grid grid-cols-1 lg:grid-cols-12 bg-slate-900/85 backdrop-blur-2xl border border-indigo-500/25 rounded-3xl shadow-[0_25px_70px_rgba(0,0,0,0.75)] overflow-hidden my-auto">
                 {/* Left Brand Panel */}
-                <div className="hidden lg:flex lg:col-span-5 flex-col justify-between p-8 bg-linear-to-br from-indigo-600/20 via-purple-600/15 to-slate-900/60 border-r border-indigo-500/20">
+                <div className="hidden lg:flex lg:col-span-5 flex-col justify-between p-8 bg-gradient-to-br from-indigo-600/20 via-purple-600/15 to-slate-900/60 border-r border-indigo-500/20">
                     <div>
                         <Link
                             href="/"
@@ -103,7 +103,7 @@ export default function SignupPage() {
                         </Link>
 
                         <div className="flex items-center gap-3 mb-6">
-                            <div className="w-11 h-11 rounded-2xl bg-linear-to-tr from-indigo-600 via-violet-600 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/30 border border-indigo-400/30">
+                            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-violet-600 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/30 border border-indigo-400/30 shrink-0">
                                 <Sparkles className="w-5 h-5 text-white" />
                             </div>
                             <div>
@@ -146,7 +146,7 @@ export default function SignupPage() {
                 <div className="lg:col-span-7 p-6 sm:p-10 flex flex-col justify-center">
                     <div className="flex items-center justify-between mb-6">
                         <div>
-                            <h2 className="text-2xl font-bold text-white">Create Account</h2>
+                            <h2 className="text-xl sm:text-2xl font-bold text-white">Create Account</h2>
                             <p className="text-xs text-slate-400 mt-1">
                                 Get started with your free Nova AI account
                             </p>
@@ -160,7 +160,7 @@ export default function SignupPage() {
                         </Link>
                     </div>
 
-                    <form onSubmit={handleSignup} className="space-y-4">
+                    <form onSubmit={handleSignup} className="space-y-3.5">
                         <div>
                             <label className="block text-xs font-medium text-slate-300 mb-1.5">
                                 Full Name
@@ -247,7 +247,7 @@ export default function SignupPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full py-3.5 rounded-xl bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold text-sm shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+                            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold text-sm shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 mt-2"
                         >
                             {loading ? (
                                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -258,7 +258,7 @@ export default function SignupPage() {
                         </button>
                     </form>
 
-                    <div className="mt-6 pt-5 border-t border-indigo-500/15 text-center">
+                    <div className="mt-5 pt-4 border-t border-indigo-500/15 text-center">
                         <p className="text-xs text-slate-400">
                             Already have an account?{" "}
                             <Link
