@@ -1,26 +1,36 @@
 import { NextResponse } from "next/server";
 
-const PERSONA_PROMPTS: Record<string, string> = {
-    assistant:
-        "You are Nova, an enterprise-grade, articulate, and highly capable AI Executive Assistant. Provide clear, structured, and helpful answers.",
-    architect:
-        "You are Nova, a Principal Software Architect and Senior Full-Stack Engineer. Provide clean, production-ready code, architectural best practices, and concise technical explanations.",
-    strategist:
-        "You are Nova, a Creative Director and Business Strategist. Help with marketing, copywriting, product positioning, and high-impact brainstorming.",
-    tutor:
-        "You are Nova, an encouraging and patient AI Tutor & Communication Coach. Explain complex concepts simply with examples.",
-    support:
-        "You are Nova, a Senior Customer Success & Technical Support Specialist. Be empathetic, solution-oriented, and step-by-step.",
-};
-
 const FALLBACK_FREE_MODELS = [
     "llama-3.1-8b-instant",
+    "llama-3.3-70b-versatile",
     "llama3-8b-8192",
     "llama3-70b-8192",
     "gemma2-9b-it",
 ];
 
-// GET: Fetch active free models directly from the user's Groq API key
+const PERSONA_PROMPTS: Record<string, string> = {
+    assistant:
+        "You are Nova, a warm, articulate, and intelligent AI Executive Assistant. Provide clear, natural, and directly helpful answers.",
+    architect:
+        "You are Nova, a Principal Software Architect and Full-Stack Engineer. Provide clean, production-grade architectural guidance and concise explanations.",
+    strategist:
+        "You are Nova, a Senior Creative & Product Growth Strategist. Offer high-impact marketing, branding, and storytelling ideas.",
+    tutor:
+        "You are Nova, an encouraging AI Learning Coach. Break down complex concepts into simple, intuitive step-by-step explanations.",
+    support:
+        "You are Nova, an empathetic Technical Support Specialist. Diagnose issues methodically and guide the user with calm, actionable steps.",
+};
+
+const LANGUAGE_INSTRUCTIONS: Record<string, string> = {
+    "en-US": "Respond in clear, natural English.",
+    "en-GB": "Respond in clear, natural British English.",
+    "ur-PK":
+        "Respond in natural Urdu (or Roman Urdu if the user writes in Roman Urdu) so it is easy to read and listen to.",
+    "hi-IN":
+        "Respond in natural Hindi (or Hinglish if the user writes in Latin script).",
+    "ar-SA": "Respond in clear, natural Arabic.",
+};
+
 export async function GET() {
     try {
         const apiKey = process.env.GROQ_API_KEY;
@@ -30,6 +40,7 @@ export async function GET() {
 
         const res = await fetch("https://api.groq.com/openai/v1/models", {
             headers: { Authorization: `Bearer ${apiKey}` },
+            cache: "no-store",
         });
 
         if (!res.ok) {
@@ -37,16 +48,43 @@ export async function GET() {
         }
 
         const data = await res.json();
-        const chatModels = (data?.data || [])
-            .map((m: any) => m.id as string)
-            .filter(
-                (id: string) =>
-                    !id.includes("whisper") &&
-                    !id.includes("guard") &&
-                    !id.includes("tts") &&
-                    !id.includes("vision") &&
-                    !id.includes("playai")
-            );
+        const rawModels: Array<{ id: string; owned_by?: string }> =
+            data?.data || [];
+
+        // Filter out non-conversational or restricted models like allam-2-7b, whisper, guard, tts
+        const blockedKeywords = [
+            "whisper",
+            "guard",
+            "tts",
+            "vision",
+            "playai",
+            "allam",
+            "embedding",
+            "compound",
+            " safeguard",
+        ];
+
+        const chatModels = rawModels
+            .filter((m) => {
+                const id = m.id.toLowerCase();
+                return !blockedKeywords.some((kw) => id.includes(kw));
+            })
+            .map((m) => ({
+                id: m.id,
+                name: m.id,
+                provider: `${m.owned_by || "Groq"} • Free Tier`,
+                badge: "FREE • Active",
+                description: "Verified active free model on your Groq API key",
+            }));
+
+        // Prioritize llama-3.1-8b-instant at the very top of the list
+        chatModels.sort((a, b) => {
+            if (a.id === "llama-3.1-8b-instant") return -1;
+            if (b.id === "llama-3.1-8b-instant") return 1;
+            if (a.id === "llama-3.3-70b-versatile") return -1;
+            if (b.id === "llama-3.3-70b-versatile") return 1;
+            return a.id.localeCompare(b.id);
+        });
 
         return NextResponse.json({ models: chatModels });
     } catch {
@@ -54,165 +92,117 @@ export async function GET() {
     }
 }
 
-async function callGroqChat(
-    apiKey: string,
-    model: string,
-    systemContent: string,
-    sanitizedMessages: { role: string; content: string }[],
-    isVoiceCall: boolean
-) {
-    return fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-            Authorization: `Bearer ${apiKey}`,
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            model,
-            messages: [
-                { role: "system", content: systemContent },
-                ...sanitizedMessages,
-            ],
-            temperature: 0.7,
-            max_tokens: isVoiceCall ? 250 : 1024,
-        }),
-    });
-}
-
 export async function POST(req: Request) {
     try {
         const body = await req.json();
         const {
-            messages = [],
+            messages,
             model = "llama-3.1-8b-instant",
             persona = "assistant",
             language = "en-US",
             isVoiceCall = false,
         } = body;
 
-        const apiKey = process.env.GROQ_API_KEY;
+        if (!messages || !Array.isArray(messages) || messages.length === 0) {
+            return NextResponse.json(
+                { error: "Messages array is required." },
+                { status: 400 }
+            );
+        }
 
+        const apiKey = process.env.GROQ_API_KEY;
         if (!apiKey) {
             return NextResponse.json(
                 {
-                    reply:
-                        "Configuration Alert: GROQ_API_KEY is missing in your .env.local file. Please add your Groq API key and restart the server.",
+                    error:
+                        "GROQ_API_KEY is missing in .env.local. Please add your Groq API key and restart the server.",
                 },
-                { status: 200 }
+                { status: 500 }
             );
         }
 
         const sanitizedMessages = messages
             .filter(
-                (m: any) =>
-                    m && m.content && (m.role === "user" || m.role === "assistant")
+                (m: { role?: string; content?: string }) =>
+                    m &&
+                    typeof m.role === "string" &&
+                    typeof m.content === "string" &&
+                    m.content.trim() !== ""
             )
-            .map((m: any) => ({
+            .map((m: { role: string; content: string }) => ({
                 role: m.role,
-                content: String(m.content),
+                content: m.content.trim(),
             }));
 
-        const baseSystemPrompt =
+        const personaInstruction =
             PERSONA_PROMPTS[persona] || PERSONA_PROMPTS.assistant;
-
         const languageInstruction =
-            language === "ur-PK"
-                ? "Respond naturally in Roman Urdu or English as preferred by the user."
-                : language === "hi-IN"
-                    ? "Respond naturally in Hindi / Hinglish or English as preferred by the user."
-                    : language === "ar-SA"
-                        ? "Respond naturally in Arabic or English as preferred by the user."
-                        : "Always respond in professional, natural English.";
-
+            LANGUAGE_INSTRUCTIONS[language] || LANGUAGE_INSTRUCTIONS["en-US"];
         const voiceInstruction = isVoiceCall
-            ? "IMPORTANT: The user is currently on a live voice call with you. Keep your response conversational, natural for speech synthesis, and concise (2 to 3 sentences maximum) without markdown symbols."
-            : "Format your response cleanly for readability.";
+            ? "IMPORTANT: The user is in a live hands-free voice call. Keep your response conversational, natural, and concise (1 to 3 sentences maximum) without markdown symbols or bullet points so it sounds natural when spoken aloud."
+            : "Format your response clearly and concisely.";
 
-        const systemContent = `${baseSystemPrompt}\n${languageInstruction}\n${voiceInstruction}`;
+        const systemPrompt = `${personaInstruction}\n${languageInstruction}\n${voiceInstruction}`;
 
-        // 1. Try with user's selected model
-        let usedModel = model;
-        let response = await callGroqChat(
-            apiKey,
-            usedModel,
-            systemContent,
-            sanitizedMessages,
-            isVoiceCall
-        );
-        let data = await response.json();
+        // Never use allam-2-7b as primary model
+        const safeRequestedModel = model.toLowerCase().includes("allam")
+            ? "llama-3.1-8b-instant"
+            : model;
 
-        // 2. Auto-Fallback if selected model is restricted or deprecated on user's free tier
-        if (!response.ok) {
-            for (const fallbackModel of FALLBACK_FREE_MODELS) {
-                if (fallbackModel === usedModel) continue;
-                const retryRes = await callGroqChat(
-                    apiKey,
-                    fallbackModel,
-                    systemContent,
-                    sanitizedMessages,
-                    isVoiceCall
-                );
-                if (retryRes.ok) {
-                    response = retryRes;
-                    data = await retryRes.json();
-                    usedModel = fallbackModel;
-                    break;
-                }
-            }
-        }
+        const candidateModels = [
+            safeRequestedModel,
+            ...FALLBACK_FREE_MODELS.filter((m) => m !== safeRequestedModel),
+        ];
 
-        // 3. Dynamic discovery fallback if all static models failed
-        if (!response.ok) {
-            const modelsRes = await fetch("https://api.groq.com/openai/v1/models", {
-                headers: { Authorization: `Bearer ${apiKey}` },
-            });
-            if (modelsRes.ok) {
-                const modelsData = await modelsRes.json();
-                const availableModel = (modelsData?.data || [])
-                    .map((m: any) => m.id as string)
-                    .find(
-                        (id: string) =>
-                            !id.includes("whisper") &&
-                            !id.includes("guard") &&
-                            !id.includes("tts")
-                    );
+        let lastErrorMessage = "Failed to generate response from Groq.";
 
-                if (availableModel) {
-                    const retryRes = await callGroqChat(
-                        apiKey,
-                        availableModel,
-                        systemContent,
-                        sanitizedMessages,
-                        isVoiceCall
-                    );
-                    if (retryRes.ok) {
-                        response = retryRes;
-                        data = await retryRes.json();
-                        usedModel = availableModel;
-                    }
-                }
-            }
-        }
-
-        if (!response.ok) {
-            return NextResponse.json(
+        for (const candidateModel of candidateModels) {
+            const response = await fetch(
+                "https://api.groq.com/openai/v1/chat/completions",
                 {
-                    reply:
-                        data?.error?.message ||
-                        "Unable to process the request. Please verify your GROQ_API_KEY.",
-                },
-                { status: 200 }
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${apiKey}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        model: candidateModel,
+                        messages: [
+                            { role: "system", content: systemPrompt },
+                            ...sanitizedMessages,
+                        ],
+                        temperature: 0.65,
+                        max_tokens: isVoiceCall ? 300 : 1024,
+                    }),
+                }
             );
+
+            const data = await response.json();
+
+            if (response.ok && data?.choices?.[0]?.message?.content) {
+                // Strip <think>...</think> tags if a reasoning model is selected
+                const rawReply: string = data.choices[0].message.content;
+                const cleanReply = rawReply
+                    .replace(/<think>[\s\S]*?<\/think>/gi, "")
+                    .trim();
+
+                if (cleanReply) {
+                    return NextResponse.json({
+                        reply: cleanReply,
+                        usedModel: candidateModel,
+                    });
+                }
+            }
+
+            lastErrorMessage =
+                data?.error?.message || `Model ${candidateModel} unavailable.`;
         }
 
-        const reply =
-            data.choices?.[0]?.message?.content ||
-            "I apologize, I could not generate a response at this moment.";
-
-        return NextResponse.json({ reply, usedModel });
-    } catch {
+        return NextResponse.json({ error: lastErrorMessage }, { status: 400 });
+    } catch (error: unknown) {
+        console.error("Chat Route Error:", error);
         return NextResponse.json(
-            { error: "Internal Server Error" },
+            { error: "Internal Server Error while communicating with Groq." },
             { status: 500 }
         );
     }
