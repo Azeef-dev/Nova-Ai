@@ -658,11 +658,23 @@ export default function VoiceChatApp() {
         stopSpeaking();
         setActiveSessionId(found._id);
         setMessages(found.messages || []);
-        if (found.persona) setSelectedPersona(found.persona);
-        if (found.model && !found.model.toLowerCase().includes("allam")) {
+
+        if (found.persona && PERSONAS.some((p) => p.id === found.persona)) {
+            setSelectedPersona(found.persona);
+        }
+
+        // Only restore the saved model if it is still a valid, currently
+        // active chat model — an older session may reference a model
+        // (a voice/TTS model that slipped through before filtering, or
+        // one Groq has since decommissioned) that should no longer be used.
+        if (found.model && availableModels.some((m) => m.id === found.model)) {
             setSelectedModel(found.model);
         }
-        if (found.language) setSelectedLanguage(found.language);
+
+        if (found.language && LANGUAGES.some((l) => l.id === found.language)) {
+            setSelectedLanguage(found.language);
+        }
+
         toast.success(`Loaded "${found.title}"`);
     };
 
