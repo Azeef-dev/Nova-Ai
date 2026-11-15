@@ -46,6 +46,7 @@ export type PersonaOption = {
 };
 
 export type LanguageOption = {
+    region: ReactNode;
     code: Key | null | undefined;
     code(code: any): unknown;
     label: ReactNode;
