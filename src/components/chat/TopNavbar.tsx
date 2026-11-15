@@ -92,10 +92,10 @@ export default function TopNavbar({
     return (
         <header
             ref={dropdownContainerRef}
-            className="min-h-16 px-3 lg:px-4 py-2.5 bg-slate-950/80 backdrop-blur-xl border-b border-indigo-500/20 flex items-center justify-between gap-2 shrink-0 z-30"
+            className="min-h-16 px-2 sm:px-4 py-2.5 bg-slate-950/80 backdrop-blur-xl border-b border-indigo-500/20 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 shrink-0 z-30"
         >
             {/* LEFT GROUP — Sidebar toggle + Selector dropdowns */}
-            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+            <div className="flex items-center gap-1.5 min-w-0 flex-wrap sm:flex-nowrap">
                 {!isSidebarOpen && (
                     <button
                         type="button"
@@ -114,20 +114,17 @@ export default function TopNavbar({
                         onClick={() =>
                             setOpenDropdown(openDropdown === "model" ? null : "model")
                         }
-                        className="px-2.5 sm:px-3 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-indigo-500/25 text-xs font-medium text-slate-200 flex items-center gap-1.5 transition-all cursor-pointer"
+                        className="px-2 sm:px-3 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-indigo-500/25 text-xs font-medium text-slate-200 flex items-center gap-1 transition-all cursor-pointer"
                     >
-                        <Cpu className="w-4 h-4 text-indigo-400 shrink-0" />
-                        <span className="truncate max-w-22.5 sm:max-w-32.5 md:max-w-40">
+                        <Cpu className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-400 shrink-0" />
+                        <span className="truncate max-w-20 sm:max-w-28 md:max-w-36">
                             {currentModel.name}
                         </span>
-                        <span className="hidden xl:inline-block text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shrink-0">
-                            {currentModel.badge}
-                        </span>
-                        <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <ChevronDown className="w-3 h-3 text-slate-400 shrink-0" />
                     </button>
 
                     {openDropdown === "model" && (
-                        <div className="absolute left-0 mt-2 w-80 rounded-2xl bg-slate-900/95 backdrop-blur-2xl border border-indigo-500/30 shadow-2xl p-2 z-50 max-h-96 overflow-y-auto custom-scrollbar">
+                        <div className="absolute left-0 mt-2 w-72 sm:w-80 rounded-2xl bg-slate-900/95 backdrop-blur-2xl border border-indigo-500/30 shadow-2xl p-2 z-50 max-h-96 overflow-y-auto custom-scrollbar">
                             <div className="px-3 py-2 border-b border-slate-800 flex items-center justify-between">
                                 <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
                                     Groq Free Tier Models
@@ -188,15 +185,15 @@ export default function TopNavbar({
                         onClick={() =>
                             setOpenDropdown(openDropdown === "persona" ? null : "persona")
                         }
-                        className="px-2.5 sm:px-3 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-indigo-500/25 text-xs font-medium text-slate-200 flex items-center gap-1.5 transition-all cursor-pointer"
+                        className="px-2 sm:px-3 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-indigo-500/25 text-xs font-medium text-slate-200 flex items-center gap-1 transition-all cursor-pointer"
                     >
                         <span className="text-indigo-400 shrink-0">
-                            <currentPersona.icon className="w-4 h-4" />
+                            <currentPersona.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         </span>
-                        <span className="hidden md:inline truncate max-w-30">
+                        <span className="hidden md:inline truncate max-w-28">
                             {currentPersona.name}
                         </span>
-                        <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <ChevronDown className="w-3 h-3 text-slate-400 shrink-0" />
                     </button>
 
                     {openDropdown === "persona" && (
@@ -251,13 +248,13 @@ export default function TopNavbar({
                         onClick={() =>
                             setOpenDropdown(openDropdown === "language" ? null : "language")
                         }
-                        className="px-2.5 sm:px-3 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-indigo-500/25 text-xs font-medium text-slate-200 flex items-center gap-1.5 transition-all cursor-pointer"
+                        className="px-2 sm:px-3 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-indigo-500/25 text-xs font-medium text-slate-200 flex items-center gap-1 transition-all cursor-pointer"
                     >
-                        <Globe className="w-4 h-4 text-indigo-400 shrink-0" />
-                        <span className="hidden sm:inline truncate max-w-22.5">
+                        <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-400 shrink-0" />
+                        <span className="hidden sm:inline truncate max-w-20">
                             {currentLanguage.name}
                         </span>
-                        <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <ChevronDown className="w-3 h-3 text-slate-400 shrink-0" />
                     </button>
 
                     {openDropdown === "language" && (
@@ -300,11 +297,11 @@ export default function TopNavbar({
             </div>
 
             {/* RIGHT GROUP — Sign In / Mute / Options / Call */}
-            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 ml-auto">
+            <div className="flex items-center gap-1.5 shrink-0 ml-auto">
                 {!user ? (
                     <Link
                         href="/login"
-                        className="hidden sm:flex px-3 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-indigo-500/25 text-xs font-medium text-indigo-300 items-center gap-1.5 transition-all cursor-pointer shrink-0"
+                        className="hidden sm:flex px-2.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-indigo-500/25 text-xs font-medium text-indigo-300 items-center gap-1 transition-all cursor-pointer shrink-0"
                     >
                         <LogIn className="w-3.5 h-3.5" />
                         <span>Sign In</span>
@@ -312,7 +309,7 @@ export default function TopNavbar({
                 ) : (
                     <div className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-medium shrink-0">
                         <UserCheck className="w-3.5 h-3.5" />
-                        <span className="truncate max-w-27.5">{user.name}</span>
+                        <span className="truncate max-w-24">{user.name}</span>
                     </div>
                 )}
 
@@ -325,7 +322,7 @@ export default function TopNavbar({
                         if (nextMute) onStopSpeaking();
                     }}
                     title={isMuted ? "Unmute Voice Output" : "Mute Voice Output"}
-                    className={`p-2.5 rounded-xl border transition-all cursor-pointer shrink-0 ${isMuted
+                    className={`p-2 rounded-xl border transition-all cursor-pointer shrink-0 ${isMuted
                             ? "bg-rose-500/15 border-rose-500/40 text-rose-300 hover:bg-rose-500/25"
                             : "bg-slate-900/90 border-indigo-500/25 text-emerald-400 hover:bg-slate-800"
                         }`}
@@ -344,15 +341,15 @@ export default function TopNavbar({
                         onClick={() =>
                             setOpenDropdown(openDropdown === "settings" ? null : "settings")
                         }
-                        className="px-2.5 sm:px-3 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-indigo-500/25 text-xs font-medium text-slate-200 flex items-center gap-1.5 transition-all cursor-pointer"
+                        className="px-2 sm:px-3 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-indigo-500/25 text-xs font-medium text-slate-200 flex items-center gap-1 transition-all cursor-pointer"
                     >
-                        <SlidersHorizontal className="w-4 h-4 text-indigo-400 shrink-0" />
+                        <SlidersHorizontal className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-400 shrink-0" />
                         <span className="hidden sm:inline">Options</span>
-                        <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <ChevronDown className="w-3 h-3 text-slate-400 shrink-0" />
                     </button>
 
                     {openDropdown === "settings" && (
-                        <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-slate-900/95 backdrop-blur-2xl border border-indigo-500/30 shadow-2xl p-3 z-50 space-y-3">
+                        <div className="absolute right-0 mt-2 w-64 sm:w-72 rounded-2xl bg-slate-900/95 backdrop-blur-2xl border border-indigo-500/30 shadow-2xl p-3 z-50 space-y-3">
                             <div className="px-2 py-1 border-b border-slate-800">
                                 <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
                                     Voice & Workspace Settings
@@ -370,7 +367,7 @@ export default function TopNavbar({
                                             key={rate.value}
                                             type="button"
                                             onClick={() => setSpeechRate(rate.value)}
-                                            className={`px-2.5 py-1.5 rounded-lg text-[11px] font-medium border transition-all cursor-pointer ${speechRate === rate.value
+                                            className={`px-2 py-1.5 rounded-lg text-[11px] font-medium border transition-all cursor-pointer ${speechRate === rate.value
                                                     ? "bg-indigo-600/30 border-indigo-500 text-white"
                                                     : "bg-slate-800/70 border-slate-700/70 text-slate-400 hover:text-white"
                                                 }`}
@@ -426,9 +423,9 @@ export default function TopNavbar({
                     <button
                         type="button"
                         onClick={onStartVoiceCall}
-                        className="px-3 sm:px-3.5 py-2.5 rounded-xl bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-xs shadow-lg shadow-emerald-600/25 flex items-center gap-1.5 sm:gap-2 transition-all cursor-pointer active:scale-95 shrink-0"
+                        className="px-2.5 sm:px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-xs shadow-lg shadow-emerald-600/25 flex items-center gap-1.5 transition-all cursor-pointer active:scale-95 shrink-0"
                     >
-                        <PhoneCall className="w-4 h-4 shrink-0" />
+                        <PhoneCall className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
                         <span className="hidden sm:inline">Start Voice Call</span>
                         <span className="sm:hidden">Call</span>
                     </button>
@@ -436,9 +433,9 @@ export default function TopNavbar({
                     <button
                         type="button"
                         onClick={onEndVoiceCall}
-                        className="px-3 sm:px-3.5 py-2.5 rounded-xl bg-linear-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-semibold text-xs shadow-lg shadow-rose-600/30 flex items-center gap-1.5 sm:gap-2 transition-all cursor-pointer animate-pulse shrink-0"
+                        className="px-2.5 sm:px-3.5 py-2 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-semibold text-xs shadow-lg shadow-rose-600/30 flex items-center gap-1.5 transition-all cursor-pointer animate-pulse shrink-0"
                     >
-                        <PhoneOff className="w-4 h-4 shrink-0" />
+                        <PhoneOff className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
                         <span>End Call</span>
                     </button>
                 )}
