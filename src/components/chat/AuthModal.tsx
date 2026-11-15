@@ -65,8 +65,8 @@ export default function AuthModal({
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 backdrop-blur-md p-4">
-            <div className="relative w-full max-w-md rounded-3xl bg-slate-900 border border-indigo-500/30 shadow-2xl p-6 text-slate-100">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4 overflow-y-auto">
+            <div className="relative w-full max-w-md rounded-3xl bg-slate-900 border border-indigo-500/30 shadow-2xl p-5 sm:p-6 text-slate-100 my-auto">
                 <button
                     onClick={onClose}
                     className="absolute top-4 right-4 p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white transition cursor-pointer"
@@ -74,17 +74,17 @@ export default function AuthModal({
                     <X className="w-4 h-4" />
                 </button>
 
-                <div className="flex items-center gap-3 mb-5">
-                    <div className="flex items-center justify-center w-11 h-11 rounded-2xl bg-linear-to-tr from-indigo-600 to-violet-500 shadow-lg shadow-indigo-500/30">
+                <div className="flex items-center gap-3 mb-5 pr-8">
+                    <div className="flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 shadow-lg shadow-indigo-500/30 shrink-0">
                         <Sparkles className="w-5 h-5 text-white" />
                     </div>
-                    <div>
-                        <h2 className="text-lg font-bold text-white">
+                    <div className="min-w-0">
+                        <h2 className="text-base sm:text-lg font-bold text-white truncate">
                             {mode === "login" ? "Welcome Back to Nova" : "Create Nova Account"}
                         </h2>
-                        <p className="text-xs text-slate-400 flex items-center gap-1">
-                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                            <span>Sync your voice & chat history with MongoDB</span>
+                        <p className="text-[11px] sm:text-xs text-slate-400 flex items-center gap-1">
+                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                            <span className="truncate">Sync history with MongoDB</span>
                         </p>
                     </div>
                 </div>
@@ -187,7 +187,7 @@ export default function AuthModal({
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-linear-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/30 transition cursor-pointer disabled:opacity-50"
+                        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/30 transition cursor-pointer disabled:opacity-50 mt-2"
                     >
                         {loading ? (
                             <Loader2 className="w-4 h-4 animate-spin" />
