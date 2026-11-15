@@ -8,11 +8,6 @@ import {
     MessageSquarePlus,
     Layers,
     Check,
-    Briefcase,
-    Code2,
-    Lightbulb,
-    GraduationCap,
-    Headphones,
     History,
     MessageSquare,
     Trash2,
@@ -21,7 +16,7 @@ import {
     LogOut,
     UserCheck,
 } from "lucide-react";
-import { PersonaOption, ChatSessionItem, UserProfile } from "@/types/chat";
+import { ChatSessionItem, UserProfile } from "@/types/chat";
 import { PERSONAS } from "@/constants/chatData";
 
 interface SidebarProps {
@@ -38,23 +33,6 @@ interface SidebarProps {
     onDeleteSession: (id: string, e: React.MouseEvent) => void;
     user: UserProfile | null;
     onLogout: () => void;
-}
-
-export function renderPersonaIcon(iconType: string) {
-    switch (iconType) {
-        case "briefcase":
-            return <Briefcase className="w-4 h-4" />;
-        case "code":
-            return <Code2 className="w-4 h-4" />;
-        case "lightbulb":
-            return <Lightbulb className="w-4 h-4" />;
-        case "graduation":
-            return <GraduationCap className="w-4 h-4" />;
-        case "headphones":
-            return <Headphones className="w-4 h-4" />;
-        default:
-            return <Sparkles className="w-4 h-4" />;
-    }
 }
 
 export default function Sidebar({
@@ -234,14 +212,15 @@ export default function Sidebar({
                                             className={personaBtnClass}
                                         >
                                             <div
-                                                className={`p-2 rounded-lg mt-0.5 ${active
+                                                className={`p-2 rounded-lg mt-0.5 shrink-0 ${active
                                                     ? "bg-indigo-500 text-white"
                                                     : "bg-slate-800 text-slate-400"
                                                     }`}
                                             >
-                                                <persona.icon className="w-4 h-4" />                                            </div>
+                                                <persona.icon className="w-4 h-4" />
+                                            </div>
                                             <div className="flex-1 min-w-0">
-                                                <div className="flex items-center justify-between">
+                                                <div className="flex items-center justify-between gap-2">
                                                     <p className="text-xs font-semibold truncate">
                                                         {persona.name}
                                                     </p>
@@ -249,6 +228,9 @@ export default function Sidebar({
                                                         <Check className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
                                                     )}
                                                 </div>
+                                                <p className="text-[11px] text-slate-400 mt-0.5 line-clamp-2">
+                                                    {persona.description}
+                                                </p>
                                             </div>
                                         </button>
                                     );
@@ -302,9 +284,9 @@ export default function Sidebar({
                             </div>
                         )}
 
-                        <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
-                            <span className="truncate max-w-42.5">{selectedModel}</span>
-                            <span className="text-indigo-300 font-medium">
+                        <div className="flex items-center justify-between gap-2 text-[11px] text-slate-400 px-1">
+                            <span className="truncate min-w-0">{selectedModel}</span>
+                            <span className="text-indigo-300 font-medium shrink-0">
                                 {selectedLanguage}
                             </span>
                         </div>
