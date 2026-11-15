@@ -37,7 +37,7 @@ export default function VoiceChatApp() {
         PERSONAS[0].id
     );
     const [selectedLanguage, setSelectedLanguage] = useState<string>(
-        LANGUAGES[0].code
+        LANGUAGES[0].id
     );
     const [speechRate, setSpeechRate] = useState<number>(1.0);
     const [autoSpeakReplies, setAutoSpeakReplies] = useState<boolean>(true);
