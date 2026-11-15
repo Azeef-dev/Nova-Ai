@@ -247,7 +247,7 @@ export default function TopNavbar({
                         className="px-3.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-indigo-500/25 text-xs font-medium text-slate-200 flex items-center gap-2 transition-all cursor-pointer"
                     >
                         <Globe className="w-4 h-4 text-indigo-400" />
-                        <span className="hidden sm:inline">{currentLanguage.label}</span>
+                        <span className="hidden sm:inline">{currentLanguage.name}</span>
                         <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
                     </button>
 
