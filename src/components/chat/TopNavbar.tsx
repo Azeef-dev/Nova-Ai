@@ -438,7 +438,7 @@ export default function TopNavbar({
                     <button
                         type="button"
                         onClick={onStartVoiceCall}
-                        className="px-3 sm:px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-xs shadow-lg shadow-emerald-600/25 flex items-center gap-1.5 sm:gap-2 transition-all cursor-pointer active:scale-95 shrink-0"
+                        className="px-3 sm:px-4 py-2 rounded-xl bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-xs shadow-lg shadow-emerald-600/25 flex items-center gap-1.5 sm:gap-2 transition-all cursor-pointer active:scale-95 shrink-0"
                     >
                         <PhoneCall className="w-4 h-4 shrink-0" />
                         <span>Start Voice Call</span>
@@ -447,7 +447,7 @@ export default function TopNavbar({
                     <button
                         type="button"
                         onClick={onEndVoiceCall}
-                        className="px-3 sm:px-4 py-2 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-semibold text-xs shadow-lg shadow-rose-600/30 flex items-center gap-1.5 sm:gap-2 transition-all cursor-pointer animate-pulse shrink-0"
+                        className="px-3 sm:px-4 py-2 rounded-xl bg-linear-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-semibold text-xs shadow-lg shadow-rose-600/30 flex items-center gap-1.5 sm:gap-2 transition-all cursor-pointer animate-pulse shrink-0"
                     >
                         <PhoneOff className="w-4 h-4 shrink-0" />
                         <span>End Call</span>
