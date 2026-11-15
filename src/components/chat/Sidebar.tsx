@@ -51,7 +51,7 @@ export default function Sidebar({
     onLogout,
 }: SidebarProps) {
     const sidebarContainerClass = [
-        "fixed md:relative z-40 h-full bg-slate-950/90 backdrop-blur-2xl border-indigo-500/20 shrink-0 overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+        "fixed md:relative z-40 h-full bg-slate-950/95 backdrop-blur-2xl border-indigo-500/20 shrink-0 overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
         isSidebarOpen
             ? "w-72 lg:w-80 translate-x-0 opacity-100 border-r shadow-2xl md:shadow-none"
             : "w-0 -translate-x-full md:translate-x-0 opacity-0 border-r-0 pointer-events-none",
@@ -62,29 +62,29 @@ export default function Sidebar({
             <div
                 onClick={() => setIsSidebarOpen(false)}
                 className={`fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-30 md:hidden transition-opacity duration-300 ${isSidebarOpen
-                    ? "opacity-100 pointer-events-auto cursor-pointer"
-                    : "opacity-0 pointer-events-none"
+                        ? "opacity-100 pointer-events-auto cursor-pointer"
+                        : "opacity-0 pointer-events-none"
                     }`}
             />
 
             <aside className={sidebarContainerClass}>
                 <div className="w-72 lg:w-80 h-full flex flex-col justify-between">
                     {/* Top Brand */}
-                    <div className="p-5 border-b border-indigo-500/20 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-linear-to-tr from-indigo-600 via-violet-600 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/30 border border-indigo-400/30">
+                    <div className="p-4 sm:p-5 border-b border-indigo-500/20 flex items-center justify-between shrink-0">
+                        <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-violet-600 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/30 border border-indigo-400/30 shrink-0">
                                 <Sparkles className="w-5 h-5 text-white" />
                             </div>
-                            <div>
+                            <div className="min-w-0">
                                 <div className="flex items-center gap-2">
-                                    <h1 className="font-bold text-base tracking-tight text-white">
+                                    <h1 className="font-bold text-base tracking-tight text-white truncate">
                                         Nova AI
                                     </h1>
-                                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 shrink-0">
                                         PRO
                                     </span>
                                 </div>
-                                <p className="text-xs text-slate-400">
+                                <p className="text-xs text-slate-400 truncate">
                                     Enterprise Voice Studio
                                 </p>
                             </div>
@@ -94,21 +94,21 @@ export default function Sidebar({
                             type="button"
                             onClick={() => setIsSidebarOpen(false)}
                             title="Collapse Sidebar"
-                            className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/70 transition-colors cursor-pointer"
+                            className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/70 transition-colors cursor-pointer shrink-0"
                         >
                             <PanelLeftClose className="w-4 h-4" />
                         </button>
                     </div>
 
                     {/* New Session CTA */}
-                    <div className="p-4 pb-2">
+                    <div className="p-4 pb-2 shrink-0">
                         <button
                             type="button"
                             onClick={onNewConversation}
-                            className="w-full py-3 px-4 rounded-xl bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-medium text-sm shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2.5 transition-all cursor-pointer active:scale-[0.99]"
+                            className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-medium text-sm shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2.5 transition-all cursor-pointer active:scale-[0.99]"
                         >
-                            <MessageSquarePlus className="w-4 h-4" />
-                            <span>Start New Conversation</span>
+                            <MessageSquarePlus className="w-4 h-4 shrink-0" />
+                            <span className="truncate">Start New Conversation</span>
                         </button>
                     </div>
 
@@ -117,13 +117,13 @@ export default function Sidebar({
                         {/* Saved MongoDB Chat Sessions */}
                         <div>
                             <div className="flex items-center justify-between px-2 mb-2">
-                                <div className="flex items-center gap-2">
-                                    <History className="w-3.5 h-3.5 text-indigo-400" />
-                                    <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                                <div className="flex items-center gap-2 min-w-0">
+                                    <History className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                                    <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 truncate">
                                         Saved Chat History
                                     </span>
                                 </div>
-                                <span className="text-[10px] text-slate-500 font-medium">
+                                <span className="text-[10px] text-slate-500 font-medium shrink-0">
                                     {sessions.length}
                                 </span>
                             </div>
@@ -136,15 +136,15 @@ export default function Sidebar({
                                             href="/login"
                                             className="py-2 px-3 rounded-lg bg-indigo-600/25 hover:bg-indigo-600/35 text-indigo-300 border border-indigo-500/30 font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                                         >
-                                            <LogIn className="w-3.5 h-3.5" />
-                                            <span>Sign In</span>
+                                            <LogIn className="w-3.5 h-3.5 shrink-0" />
+                                            <span className="truncate">Sign In</span>
                                         </Link>
                                         <Link
                                             href="/signup"
                                             className="py-2 px-3 rounded-lg bg-slate-800/80 hover:bg-slate-800 text-slate-200 border border-slate-700 font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                                         >
-                                            <UserPlus className="w-3.5 h-3.5" />
-                                            <span>Sign Up</span>
+                                            <UserPlus className="w-3.5 h-3.5 shrink-0" />
+                                            <span className="truncate">Sign Up</span>
                                         </Link>
                                     </div>
                                 </div>
@@ -161,8 +161,8 @@ export default function Sidebar({
                                                 key={item._id}
                                                 onClick={() => onSelectSession(item._id)}
                                                 className={`group flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl border text-left transition-all cursor-pointer ${isActive
-                                                    ? "bg-indigo-600/20 border-indigo-500/40 text-white"
-                                                    : "bg-slate-900/40 border-transparent hover:bg-slate-900/80 hover:border-slate-800 text-slate-300"
+                                                        ? "bg-indigo-600/20 border-indigo-500/40 text-white"
+                                                        : "bg-slate-900/40 border-transparent hover:bg-slate-900/80 hover:border-slate-800 text-slate-300"
                                                     }`}
                                             >
                                                 <div className="flex items-center gap-2.5 min-w-0">
@@ -189,8 +189,8 @@ export default function Sidebar({
                         {/* AI Persona Switcher */}
                         <div>
                             <div className="flex items-center gap-2 px-2 mb-2">
-                                <Layers className="w-3.5 h-3.5 text-indigo-400" />
-                                <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                                <Layers className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                                <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 truncate">
                                     AI Specialist Persona
                                 </span>
                             </div>
@@ -213,8 +213,8 @@ export default function Sidebar({
                                         >
                                             <div
                                                 className={`p-2 rounded-lg mt-0.5 shrink-0 ${active
-                                                    ? "bg-indigo-500 text-white"
-                                                    : "bg-slate-800 text-slate-400"
+                                                        ? "bg-indigo-500 text-white"
+                                                        : "bg-slate-800 text-slate-400"
                                                     }`}
                                             >
                                                 <persona.icon className="w-4 h-4" />
@@ -240,7 +240,7 @@ export default function Sidebar({
                     </div>
 
                     {/* Bottom User Account & Runtime Info */}
-                    <div className="p-4 border-t border-indigo-500/20 bg-slate-950/70 space-y-3">
+                    <div className="p-4 border-t border-indigo-500/20 bg-slate-950/70 space-y-3 shrink-0">
                         {user ? (
                             <div className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-900/90 border border-indigo-500/25">
                                 <div className="flex items-center gap-2.5 min-w-0">
@@ -260,7 +260,7 @@ export default function Sidebar({
                                     type="button"
                                     onClick={onLogout}
                                     title="Sign Out"
-                                    className="p-2 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                                    className="p-2 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer shrink-0"
                                 >
                                     <LogOut className="w-4 h-4" />
                                 </button>
@@ -271,15 +271,15 @@ export default function Sidebar({
                                     href="/login"
                                     className="py-2.5 px-3 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/30 text-xs font-semibold text-indigo-200 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
                                 >
-                                    <LogIn className="w-3.5 h-3.5" />
-                                    <span>Sign In</span>
+                                    <LogIn className="w-3.5 h-3.5 shrink-0" />
+                                    <span className="truncate">Sign In</span>
                                 </Link>
                                 <Link
                                     href="/signup"
                                     className="py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-semibold text-slate-200 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
                                 >
-                                    <UserPlus className="w-3.5 h-3.5" />
-                                    <span>Sign Up</span>
+                                    <UserPlus className="w-3.5 h-3.5 shrink-0" />
+                                    <span className="truncate">Sign Up</span>
                                 </Link>
                             </div>
                         )}
