@@ -27,7 +27,7 @@ export default function VoiceChatApp() {
     const [sessions, setSessions] = useState<ChatSessionItem[]>([]);
     const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
 
-    // Assistant Configuration State (Always default to llama-3.1-8b-instant)
+    // Assistant Configuration State
     const [availableModels, setAvailableModels] =
         useState<ModelOption[]>(DEFAULT_FREE_MODELS);
     const [selectedModel, setSelectedModel] = useState<string>(
@@ -110,7 +110,7 @@ export default function VoiceChatApp() {
         checkUser();
     }, [fetchSessions]);
 
-    // Fetch Active Free Models from Groq API without overriding llama-3.1-8b-instant with allam-2-7b
+    // Fetch Active Free Models from Groq API
     useEffect(() => {
         async function loadActiveModels() {
             try {
@@ -166,7 +166,7 @@ export default function VoiceChatApp() {
         }
     }, [updateStatus]);
 
-    // Speak Text with Safety Watchdog Timer (so Chrome TTS never hangs)
+    // Speak Text with Safety Watchdog Timer
     const speakText = useCallback(
         (text: string, onComplete?: () => void, messageId?: string) => {
             if (
@@ -195,7 +195,6 @@ export default function VoiceChatApp() {
             utterance.lang = selectedLanguage;
             utterance.rate = speechRate;
 
-            // Try matching voice for selected language
             const voices = window.speechSynthesis.getVoices();
             const matchedVoice =
                 voices.find((v) => v.lang === selectedLanguage) ||
@@ -215,7 +214,6 @@ export default function VoiceChatApp() {
                 if (onComplete) onComplete();
             };
 
-            // Safety watchdog in case Chrome speechSynthesis onend doesn't trigger
             const estimatedMs = Math.max(
                 4000,
                 Math.min(35000, cleanText.length * 90)
@@ -264,7 +262,7 @@ export default function VoiceChatApp() {
         }
     }, [updateStatus]);
 
-    // Start Microphone Listening (Fresh Instance + Real-Time Interim Captions + Auto-Send)
+    // Start Microphone Listening
     const startListening = useCallback(() => {
         if (typeof window === "undefined") return;
 
@@ -283,7 +281,6 @@ export default function VoiceChatApp() {
 
         stopSpeaking();
 
-        // Cleanly close any previous recognition instance
         if (recognitionRef.current) {
             try {
                 recognitionRef.current.onend = null;
@@ -353,7 +350,6 @@ export default function VoiceChatApp() {
                 setLiveTranscript(combined);
                 setInputText(combined);
 
-                // Wait 1.1 seconds of silence after speaking, then automatically send!
                 if (silenceTimerRef.current) {
                     clearTimeout(silenceTimerRef.current);
                 }
@@ -372,18 +368,16 @@ export default function VoiceChatApp() {
             const errCode = event?.error;
             if (errCode === "not-allowed" || errCode === "service-not-allowed") {
                 toast.error(
-                    "Microphone access denied! Please allow microphone permission in your browser address bar."
+                    "Microphone access denied! Please allow microphone permission in your browser."
                 );
                 setIsCallActive(false);
                 isCallActiveRef.current = false;
                 updateStatus("idle");
                 return;
             }
-            // Ignore 'no-speech' or 'aborted' during active voice call
         };
 
         recognition.onend = () => {
-            // If user spoke something before recognition ended, send it immediately
             if (latestTranscriptRef.current.trim()) {
                 const pending = latestTranscriptRef.current.trim();
                 latestTranscriptRef.current = "";
@@ -392,7 +386,6 @@ export default function VoiceChatApp() {
                 return;
             }
 
-            // If hands-free voice call is still active and AI is not thinking/speaking, keep listening!
             if (
                 isCallActiveRef.current &&
                 statusRef.current !== "thinking" &&
@@ -425,7 +418,6 @@ export default function VoiceChatApp() {
         }
     }, [selectedLanguage, stopSpeaking, updateStatus]);
 
-    // Force Send Live Transcript Immediately
     const handleForceSendTranscript = useCallback(() => {
         const textToSend = latestTranscriptRef.current.trim() || inputText.trim();
         if (!textToSend) return;
@@ -433,7 +425,7 @@ export default function VoiceChatApp() {
         sendMessageRef.current(textToSend);
     }, [inputText, stopListening]);
 
-    // Persist Conversation in MongoDB (if logged in)
+    // Persist Session to MongoDB
     const persistSessionToDB = useCallback(
         async (
             updatedMessages: Message[],
@@ -459,13 +451,13 @@ export default function VoiceChatApp() {
                     fetchSessions();
                 }
             } catch {
-                // Silent fail if DB not connected
+                // Silent fail
             }
         },
         [user, selectedPersona, selectedLanguage, fetchSessions]
     );
 
-    // Send User Message to Groq API
+    // Send Message
     const sendMessage = useCallback(
         async (rawText: string) => {
             const trimmed = rawText.trim();
@@ -531,7 +523,6 @@ export default function VoiceChatApp() {
                 const finalMessages = [...updatedMessages, assistantMessage];
                 setMessages(finalMessages);
 
-                // Auto-save to MongoDB if logged in
                 persistSessionToDB(finalMessages, activeSessionId, usedModel);
 
                 if (isCallActiveRef.current) {
@@ -553,7 +544,7 @@ export default function VoiceChatApp() {
                 const errorText =
                     err instanceof Error
                         ? err.message
-                        : "Connection error. Please verify your GROQ_API_KEY in .env.local.";
+                        : "Connection error. Please check your network.";
 
                 toast.error(errorText);
 
@@ -595,11 +586,11 @@ export default function VoiceChatApp() {
         sendMessageRef.current = sendMessage;
     }, [sendMessage]);
 
-    // Start Hands-Free Duplex Voice Call
+    // Start Voice Call
     const startVoiceCall = () => {
         setIsCallActive(true);
         isCallActiveRef.current = true;
-        toast.success("Hands-Free Voice Call started! Speak after the greeting.");
+        toast.success("Hands-Free Voice Call started!");
 
         const greeting =
             "Hello! Nova live voice session is active. How can I help you today?";
@@ -650,7 +641,7 @@ export default function VoiceChatApp() {
         toast.success("Started a new conversation.");
     };
 
-    // Load Saved Session from MongoDB
+    // Load Session
     const handleSelectSession = (sessionId: string) => {
         const found = sessions.find((s) => s._id === sessionId);
         if (!found) return;
@@ -663,10 +654,6 @@ export default function VoiceChatApp() {
             setSelectedPersona(found.persona);
         }
 
-        // Only restore the saved model if it is still a valid, currently
-        // active chat model — an older session may reference a model
-        // (a voice/TTS model that slipped through before filtering, or
-        // one Groq has since decommissioned) that should no longer be used.
         if (found.model && availableModels.some((m) => m.id === found.model)) {
             setSelectedModel(found.model);
         }
@@ -678,7 +665,7 @@ export default function VoiceChatApp() {
         toast.success(`Loaded "${found.title}"`);
     };
 
-    // Delete Saved Session from MongoDB
+    // Delete Session
     const handleDeleteSession = async (
         sessionId: string,
         e: React.MouseEvent
@@ -697,7 +684,7 @@ export default function VoiceChatApp() {
         }
     };
 
-    // Logout Handler
+    // Logout
     const handleLogout = async () => {
         await fetch("/api/auth", {
             method: "POST",
@@ -711,7 +698,7 @@ export default function VoiceChatApp() {
         toast.success("Signed out successfully.");
     };
 
-    // Copy Message Content
+    // Copy Message
     const copyMessage = (id: string, content: string) => {
         navigator.clipboard.writeText(content);
         setCopiedId(id);
@@ -743,7 +730,7 @@ export default function VoiceChatApp() {
         toast.success("Transcript downloaded!");
     };
 
-    // Regenerate Assistant Response
+    // Regenerate Response
     const regenerateResponse = (index: number) => {
         const previousUserMessage = [...messages]
             .slice(0, index)
@@ -763,7 +750,7 @@ export default function VoiceChatApp() {
     };
 
     return (
-        <div className="relative flex h-screen w-screen overflow-hidden bg-linear-to-br from-slate-950 via-indigo-950 to-slate-900 text-slate-100">
+        <div className="relative flex h-screen w-screen overflow-hidden bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 text-slate-100">
             {/* Ambient Background Glow */}
             <div className="pointer-events-none fixed inset-0 overflow-hidden z-0">
                 <div className="absolute -top-40 -left-40 w-96 h-96 bg-indigo-600/20 rounded-full blur-[120px]" />
