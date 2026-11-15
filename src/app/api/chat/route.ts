@@ -1,13 +1,5 @@
 import { NextResponse } from "next/server";
 
-const FALLBACK_FREE_MODELS = [
-    "llama-3.1-8b-instant",
-    "llama-3.3-70b-versatile",
-    "llama3-8b-8192",
-    "llama3-70b-8192",
-    "gemma2-9b-it",
-];
-
 const PERSONA_PROMPTS: Record<string, string> = {
     assistant:
         "You are Nova, a warm, articulate, and intelligent AI Executive Assistant. Provide clear, natural, and directly helpful answers.",
@@ -31,6 +23,11 @@ const LANGUAGE_INSTRUCTIONS: Record<string, string> = {
     "ar-SA": "Respond in clear, natural Arabic.",
 };
 
+// Only these model-family name fragments are real TEXT chat-completion
+// models on Groq. Anything that does NOT match one of these (TTS, STT,
+// vision-only, guard/moderation, embeddings, agentic "compound" systems,
+// etc.) is excluded automatically — far more reliable than blocklisting
+// every non-chat model name Groq might ever add.
 const ALLOWED_FAMILY_PATTERNS = [
     "llama",
     "gemma",
@@ -67,6 +64,56 @@ function isSafeChatModel(id: string): boolean {
     return isKnownChatFamily && !isBlocked;
 }
 
+function sortModelIds(ids: string[]): string[] {
+    return [...ids].sort((a, b) => {
+        if (a === "llama-3.1-8b-instant") return -1;
+        if (b === "llama-3.1-8b-instant") return 1;
+        if (a === "llama-3.3-70b-versatile") return -1;
+        if (b === "llama-3.3-70b-versatile") return 1;
+        return a.localeCompare(b);
+    });
+}
+
+type GroqModel = { id: string; owned_by?: string };
+
+let modelsCache: { data: GroqModel[]; expiresAt: number } | null = null;
+const MODELS_CACHE_TTL_MS = 60_000; // 1 minute
+
+// Always asks Groq directly which chat models are currently live, instead
+// of trusting a hardcoded list — this is what prevents "model has been
+// decommissioned" errors whenever Groq retires a model in the future.
+async function fetchActiveGroqChatModels(apiKey: string): Promise<GroqModel[]> {
+    const now = Date.now();
+    if (modelsCache && modelsCache.expiresAt > now) {
+        return modelsCache.data;
+    }
+
+    try {
+        const res = await fetch("https://api.groq.com/openai/v1/models", {
+            headers: { Authorization: `Bearer ${apiKey}` },
+            cache: "no-store",
+        });
+
+        if (!res.ok) {
+            return modelsCache?.data || [];
+        }
+
+        const data = await res.json();
+        const rawModels: GroqModel[] = data?.data || [];
+
+        const safeModels = rawModels.filter((m) => isSafeChatModel(m.id));
+        const sortedIds = sortModelIds(safeModels.map((m) => m.id));
+        const sortedModels = sortedIds.map(
+            (id) => safeModels.find((m) => m.id === id) as GroqModel
+        );
+
+        modelsCache = { data: sortedModels, expiresAt: now + MODELS_CACHE_TTL_MS };
+        return sortedModels;
+    } catch {
+        return modelsCache?.data || [];
+    }
+}
+
 export async function GET() {
     try {
         const apiKey = process.env.GROQ_API_KEY;
@@ -74,39 +121,17 @@ export async function GET() {
             return NextResponse.json({ models: [] });
         }
 
-        const res = await fetch("https://api.groq.com/openai/v1/models", {
-            headers: { Authorization: `Bearer ${apiKey}` },
-            cache: "no-store",
-        });
+        const activeModels = await fetchActiveGroqChatModels(apiKey);
 
-        if (!res.ok) {
-            return NextResponse.json({ models: [] });
-        }
+        const models = activeModels.map((m) => ({
+            id: m.id,
+            name: m.id,
+            provider: `${m.owned_by || "Groq"} • Free Tier`,
+            badge: "FREE • Active",
+            description: "Verified active free model on your Groq API key",
+        }));
 
-        const data = await res.json();
-        const rawModels: Array<{ id: string; owned_by?: string }> =
-            data?.data || [];
-
-        const chatModels = rawModels
-            .filter((m) => isSafeChatModel(m.id))
-            .map((m) => ({
-                id: m.id,
-                name: m.id,
-                provider: `${m.owned_by || "Groq"} • Free Tier`,
-                badge: "FREE • Active",
-                description: "Verified active free model on your Groq API key",
-            }));
-
-        // Prioritize llama-3.1-8b-instant at the very top of the list
-        chatModels.sort((a, b) => {
-            if (a.id === "llama-3.1-8b-instant") return -1;
-            if (b.id === "llama-3.1-8b-instant") return 1;
-            if (a.id === "llama-3.3-70b-versatile") return -1;
-            if (b.id === "llama-3.3-70b-versatile") return 1;
-            return a.id.localeCompare(b.id);
-        });
-
-        return NextResponse.json({ models: chatModels });
+        return NextResponse.json({ models });
     } catch {
         return NextResponse.json({ models: [] });
     }
@@ -164,16 +189,25 @@ export async function POST(req: Request) {
 
         const systemPrompt = `${personaInstruction}\n${languageInstruction}\n${voiceInstruction}`;
 
-        // Never send a non text-chat model (TTS/whisper/guard/etc.) to the
-        // chat completions endpoint — fall back to a safe default instead.
-        const safeRequestedModel = isSafeChatModel(String(model || ""))
-            ? model
-            : "llama-3.1-8b-instant";
+        // Build the candidate list from models Groq currently reports as
+        // active — never from a hardcoded list that can go stale/decommissioned.
+        const activeModels = await fetchActiveGroqChatModels(apiKey);
+        const activeIds = activeModels.map((m) => m.id);
+
+        const requestedIsValid =
+            isSafeChatModel(String(model || "")) && activeIds.includes(model);
+
+        const fallbackDefault = activeIds[0] || "llama-3.1-8b-instant";
+        const safeRequestedModel = requestedIsValid ? model : fallbackDefault;
 
         const candidateModels = [
             safeRequestedModel,
-            ...FALLBACK_FREE_MODELS.filter((m) => m !== safeRequestedModel),
+            ...activeIds.filter((id) => id !== safeRequestedModel),
         ];
+
+        if (candidateModels.length === 0) {
+            candidateModels.push("llama-3.1-8b-instant");
+        }
 
         let lastErrorMessage = "Failed to generate response from Groq.";
 
