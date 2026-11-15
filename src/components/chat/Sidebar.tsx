@@ -130,7 +130,7 @@ export default function Sidebar({
 
                             {!user ? (
                                 <div className="p-3.5 rounded-xl bg-slate-900/60 border border-indigo-500/20 text-xs text-slate-400 space-y-2.5">
-                                    <p>Sign in to save & sync your chat history in MongoDB.</p>
+                                    <p>Sign in to save & sync your chat history.</p>
                                     <div className="grid grid-cols-2 gap-2">
                                         <Link
                                             href="/login"
