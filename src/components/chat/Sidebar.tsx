@@ -92,7 +92,7 @@ export default function Sidebar({
                     {/* Top Brand */}
                     <div className="p-5 border-b border-indigo-500/20 flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-violet-600 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/30 border border-indigo-400/30">
+                            <div className="w-10 h-10 rounded-xl bg-linear-to-tr from-indigo-600 via-violet-600 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/30 border border-indigo-400/30">
                                 <Sparkles className="w-5 h-5 text-white" />
                             </div>
                             <div>
@@ -125,7 +125,7 @@ export default function Sidebar({
                         <button
                             type="button"
                             onClick={onNewConversation}
-                            className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-medium text-sm shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2.5 transition-all cursor-pointer active:scale-[0.99]"
+                            className="w-full py-3 px-4 rounded-xl bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-medium text-sm shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2.5 transition-all cursor-pointer active:scale-[0.99]"
                         >
                             <MessageSquarePlus className="w-4 h-4" />
                             <span>Start New Conversation</span>
@@ -305,7 +305,7 @@ export default function Sidebar({
                         )}
 
                         <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
-                            <span className="truncate max-w-[170px]">{selectedModel}</span>
+                            <span className="truncate max-w-42.5">{selectedModel}</span>
                             <span className="text-indigo-300 font-medium">
                                 {selectedLanguage}
                             </span>

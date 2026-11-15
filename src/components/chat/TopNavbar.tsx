@@ -118,7 +118,7 @@ export default function TopNavbar({
                         className="px-3.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-indigo-500/25 text-xs font-medium text-slate-200 flex items-center gap-2 transition-all cursor-pointer"
                     >
                         <Cpu className="w-4 h-4 text-indigo-400" />
-                        <span className="truncate max-w-[140px] sm:max-w-[180px]">
+                        <span className="truncate max-w-35 sm:max-w-45">
                             {currentModel.name}
                         </span>
                         <span className="hidden sm:inline-block text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
@@ -304,7 +304,7 @@ export default function TopNavbar({
                 ) : (
                     <div className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-medium">
                         <UserCheck className="w-3.5 h-3.5" />
-                        <span className="truncate max-w-[110px]">{user.name}</span>
+                        <span className="truncate max-w-27.5">{user.name}</span>
                     </div>
                 )}
 
@@ -418,7 +418,7 @@ export default function TopNavbar({
                     <button
                         type="button"
                         onClick={onStartVoiceCall}
-                        className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-xs shadow-lg shadow-emerald-600/25 flex items-center gap-2 transition-all cursor-pointer active:scale-95"
+                        className="px-4 py-2.5 rounded-xl bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-xs shadow-lg shadow-emerald-600/25 flex items-center gap-2 transition-all cursor-pointer active:scale-95"
                     >
                         <PhoneCall className="w-4 h-4" />
                         <span>Start Voice Call</span>
@@ -427,7 +427,7 @@ export default function TopNavbar({
                     <button
                         type="button"
                         onClick={onEndVoiceCall}
-                        className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-semibold text-xs shadow-lg shadow-rose-600/30 flex items-center gap-2 transition-all cursor-pointer animate-pulse"
+                        className="px-4 py-2.5 rounded-xl bg-linear-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-semibold text-xs shadow-lg shadow-rose-600/30 flex items-center gap-2 transition-all cursor-pointer animate-pulse"
                     >
                         <PhoneOff className="w-4 h-4" />
                         <span>End Call</span>
