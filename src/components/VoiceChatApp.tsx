@@ -807,8 +807,8 @@ export default function VoiceChatApp() {
                     selectedLanguage={selectedLanguage}
                     setSelectedLanguage={(code) => {
                         setSelectedLanguage(code);
-                        const l = LANGUAGES.find((item) => item.code === code);
-                        if (l) toast.success(`Language set to ${l.label}`);
+                        const l = LANGUAGES.find((item) => item.id === code);
+                        if (l) toast.success(`Language set to ${l.name}`);
                     }}
                     speechRate={speechRate}
                     setSpeechRate={setSpeechRate}
