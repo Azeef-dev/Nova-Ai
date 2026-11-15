@@ -31,11 +31,6 @@ const LANGUAGE_INSTRUCTIONS: Record<string, string> = {
     "ar-SA": "Respond in clear, natural Arabic.",
 };
 
-// Only these model-family name fragments are real TEXT chat-completion
-// models on Groq. Anything that does NOT match one of these (TTS, STT,
-// vision-only, guard/moderation, embeddings, agentic "compound" systems,
-// etc.) is excluded automatically — this is far more reliable than trying
-// to blocklist every non-chat model name Groq might add in the future.
 const ALLOWED_FAMILY_PATTERNS = [
     "llama",
     "gemma",
@@ -46,8 +41,6 @@ const ALLOWED_FAMILY_PATTERNS = [
     "gpt-oss",
 ];
 
-// Extra safety net: explicitly exclude known non-chat / restricted ids
-// even if one of them happens to match a family pattern above (e.g. llama-guard).
 const BLOCKED_KEYWORDS = [
     "whisper",
     "guard",
