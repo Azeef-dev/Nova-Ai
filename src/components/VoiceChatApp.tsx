@@ -75,7 +75,7 @@ export default function VoiceChatApp() {
     const currentPersona =
         PERSONAS.find((p) => p.id === selectedPersona) || PERSONAS[0];
     const currentLanguage =
-        LANGUAGES.find((l) => l.code === selectedLanguage) || LANGUAGES[0];
+        LANGUAGES.find((l) => l.id === selectedLanguage) || LANGUAGES[0];
 
     const formatTime = () =>
         new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
