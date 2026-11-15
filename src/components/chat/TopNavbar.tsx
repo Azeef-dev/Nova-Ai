@@ -95,7 +95,7 @@ export default function TopNavbar({
             className="min-h-16 px-4 lg:px-6 py-2.5 bg-slate-950/75 backdrop-blur-xl border-b border-indigo-500/20 flex items-center gap-3 shrink-0 z-30 flex-wrap gap-y-2"
         >
             {/* Left Controls & Dropdowns */}
-            <div className="flex items-center gap-2.5 flex-wrap gap-y-2">
+            <div className="flex items-center gap-2.5 flex-wrap gap-y-2 shrink-0">
                 {!isSidebarOpen && (
                     <button
                         type="button"
@@ -295,24 +295,32 @@ export default function TopNavbar({
                 </div>
             </div>
 
-            {/* Center Live Status Pill — fills the empty middle space elegantly on wide screens */}
-            <div className="hidden xl:flex flex-1 items-center justify-center min-w-0 px-4">
-                <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/60 border border-indigo-500/20 text-[11px] font-medium text-slate-300 shadow-inner shadow-black/20">
+            {/* Center Live Status Pill — never wraps internally; if there's no
+                room on the current row it wraps to the next row as a whole
+                unit instead of squashing its text (fixes the cramped look
+                that happened when the sidebar is closed and the extra
+                "open sidebar" button eats up left-side space). */}
+            <div className="hidden xl:flex items-center justify-center shrink-0 mx-auto">
+                <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/60 border border-indigo-500/20 text-[11px] font-medium text-slate-300 shadow-inner shadow-black/20 whitespace-nowrap">
                     <span className="relative flex h-2 w-2 shrink-0">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                         <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
                     </span>
-                    <span className="text-emerald-300 font-semibold">Nova is live</span>
-                    <span className="text-slate-600">•</span>
-                    <span className="flex items-center gap-1 text-indigo-300">
-                        <currentPersona.icon className="w-3 h-3" />
-                        {currentPersona.name}
+                    <span className="text-emerald-300 font-semibold shrink-0">
+                        Nova is live
+                    </span>
+                    <span className="hidden 2xl:flex items-center gap-1.5 shrink-0">
+                        <span className="text-slate-600">•</span>
+                        <span className="flex items-center gap-1 text-indigo-300 shrink-0">
+                            <currentPersona.icon className="w-3 h-3 shrink-0" />
+                            {currentPersona.name}
+                        </span>
                     </span>
                 </div>
             </div>
 
             {/* Right Action Bar — ml-auto keeps it flush right even when the header wraps */}
-            <div className="flex items-center gap-2.5 flex-wrap justify-end ml-auto">
+            <div className="flex items-center gap-2.5 flex-wrap justify-end ml-auto shrink-0">
                 {!user ? (
                     <Link
                         href="/login"
