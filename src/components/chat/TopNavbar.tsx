@@ -1,406 +1,433 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import {
     PanelLeftOpen,
     Cpu,
     ChevronDown,
     Check,
     Globe,
+    SlidersHorizontal,
+    Gauge,
     Volume2,
     VolumeX,
-    Sliders,
-    Gauge,
     Download,
     Trash2,
-    Phone,
+    PhoneCall,
     PhoneOff,
     LogIn,
     UserCheck,
 } from "lucide-react";
-import { PERSONAS, LANGUAGES, SPEECH_RATES } from "@/constants/chatData";
 import {
-    ChatStatus,
     DropdownType,
-    LanguageOption,
     ModelOption,
     PersonaOption,
+    LanguageOption,
     UserProfile,
 } from "@/types/chat";
+import { LANGUAGES, PERSONAS, SPEECH_RATES } from "@/constants/chatData";
+import { renderPersonaIcon } from "./Sidebar";
 
-type TopNavbarProps = {
-    headerRef: React.RefObject<HTMLElement | null>;
+interface TopNavbarProps {
     isSidebarOpen: boolean;
-    onOpenSidebar: () => void;
-    models: ModelOption[];
-    selectedModel: ModelOption;
-    onSelectModel: (model: ModelOption) => void;
-    selectedPersona: PersonaOption;
-    onSelectPersona: (persona: PersonaOption) => void;
-    selectedLanguage: LanguageOption;
-    onSelectLanguage: (lang: LanguageOption) => void;
+    setIsSidebarOpen: (open: boolean) => void;
     openDropdown: DropdownType;
     setOpenDropdown: (dropdown: DropdownType) => void;
-    status: ChatStatus;
-    isMuted: boolean;
-    onToggleMute: () => void;
+    dropdownContainerRef: React.RefObject<HTMLDivElement | null>;
+    availableModels: ModelOption[];
+    currentModel: ModelOption;
+    selectedModel: string;
+    setSelectedModel: (id: string) => void;
+    currentPersona: PersonaOption;
+    selectedPersona: string;
+    setSelectedPersona: (id: string) => void;
+    currentLanguage: LanguageOption;
+    selectedLanguage: string;
+    setSelectedLanguage: (code: string) => void;
     speechRate: number;
-    onSelectSpeechRate: (rate: number) => void;
-    autoSpeakChat: boolean;
-    onToggleAutoSpeak: () => void;
-    onExportTranscript: () => void;
-    onClearChat: () => void;
-    hasMessages: boolean;
+    setSpeechRate: (rate: number) => void;
+    autoSpeakReplies: boolean;
+    setAutoSpeakReplies: (auto: boolean) => void;
+    isMuted: boolean;
+    setIsMuted: (muted: boolean) => void;
     isCallActive: boolean;
-    onStartCall: () => void;
-    onEndCall: () => void;
+    onStartVoiceCall: () => void;
+    onEndVoiceCall: () => void;
+    onExportTranscript: () => void;
+    onClearConversation: () => void;
+    onStopSpeaking: () => void;
     user: UserProfile | null;
-    onOpenAuth: () => void;
-};
+}
 
 export default function TopNavbar({
-    headerRef,
     isSidebarOpen,
-    onOpenSidebar,
-    models,
-    selectedModel,
-    onSelectModel,
-    selectedPersona,
-    onSelectPersona,
-    selectedLanguage,
-    onSelectLanguage,
+    setIsSidebarOpen,
     openDropdown,
     setOpenDropdown,
-    status,
-    isMuted,
-    onToggleMute,
+    dropdownContainerRef,
+    availableModels,
+    currentModel,
+    selectedModel,
+    setSelectedModel,
+    currentPersona,
+    selectedPersona,
+    setSelectedPersona,
+    currentLanguage,
+    selectedLanguage,
+    setSelectedLanguage,
     speechRate,
-    onSelectSpeechRate,
-    autoSpeakChat,
-    onToggleAutoSpeak,
-    onExportTranscript,
-    onClearChat,
-    hasMessages,
+    setSpeechRate,
+    autoSpeakReplies,
+    setAutoSpeakReplies,
+    isMuted,
+    setIsMuted,
     isCallActive,
-    onStartCall,
-    onEndCall,
+    onStartVoiceCall,
+    onEndVoiceCall,
+    onExportTranscript,
+    onClearConversation,
+    onStopSpeaking,
     user,
-    onOpenAuth,
 }: TopNavbarProps) {
-    const PersonaIcon = selectedPersona.icon;
-
-    const sidebarBtnClass = [
-        "p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-300 transition-all duration-200 cursor-pointer",
-        isSidebarOpen
-            ? "md:opacity-0 md:w-0 md:p-0 md:border-0 md:overflow-hidden"
-            : "opacity-100",
-    ].join(" ");
-
     return (
         <header
-            ref={headerRef}
-            className="relative z-30 flex flex-wrap items-center justify-between gap-3 px-4 sm:px-6 py-3 bg-slate-900/80 backdrop-blur-xl border-b border-indigo-500/20"
+            ref={dropdownContainerRef}
+            className="h-16 px-4 lg:px-6 bg-slate-950/75 backdrop-blur-xl border-b border-indigo-500/20 flex items-center justify-between gap-3 shrink-0 z-30"
         >
-            <div className="flex flex-wrap items-center gap-2">
-                <button
-                    onClick={onOpenSidebar}
-                    title="Expand Sidebar"
-                    className={sidebarBtnClass}
-                >
-                    <PanelLeftOpen className="w-4 h-4" />
-                </button>
+            {/* Left Controls & Dropdowns */}
+            <div className="flex items-center gap-2.5 flex-wrap">
+                {!isSidebarOpen && (
+                    <button
+                        type="button"
+                        onClick={() => setIsSidebarOpen(true)}
+                        title="Open Sidebar"
+                        className="p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white border border-indigo-500/20 transition-all cursor-pointer"
+                    >
+                        <PanelLeftOpen className="w-4 h-4" />
+                    </button>
+                )}
 
-                {/* 1. Groq Free Model Dropdown */}
+                {/* 1. AI Model Selector Dropdown */}
                 <div className="relative">
                     <button
+                        type="button"
                         onClick={() =>
                             setOpenDropdown(openDropdown === "model" ? null : "model")
                         }
-                        className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 text-xs text-slate-100 transition cursor-pointer"
+                        className="px-3.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-indigo-500/25 text-xs font-medium text-slate-200 flex items-center gap-2 transition-all cursor-pointer"
                     >
-                        <Cpu className="w-3.5 h-3.5 text-indigo-400" />
-                        <span className="font-semibold">{selectedModel.name}</span>
-                        <span className="px-1.5 py-0.5 text-[10px] rounded-md bg-emerald-500/20 text-emerald-300 font-semibold border border-emerald-500/30">
-                            {selectedModel.badge}
+                        <Cpu className="w-4 h-4 text-indigo-400" />
+                        <span className="truncate max-w-[140px] sm:max-w-[180px]">
+                            {currentModel.name}
+                        </span>
+                        <span className="hidden sm:inline-block text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                            {currentModel.badge}
                         </span>
                         <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
                     </button>
 
                     {openDropdown === "model" && (
-                        <div className="absolute left-0 mt-2 w-80 rounded-2xl bg-slate-900/95 backdrop-blur-2xl border border-slate-700 shadow-2xl p-2 z-50 space-y-1">
-                            <div className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-                                Groq Free Tier Models
+                        <div className="absolute left-0 mt-2 w-80 rounded-2xl bg-slate-900/95 backdrop-blur-2xl border border-indigo-500/30 shadow-2xl p-2 z-50 max-h-96 overflow-y-auto custom-scrollbar">
+                            <div className="px-3 py-2 border-b border-slate-800 flex items-center justify-between">
+                                <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                                    Groq Free Tier Models
+                                </p>
+                                <span className="text-[10px] text-emerald-400 font-medium">
+                                    Auto-Fallback Ready
+                                </span>
                             </div>
-                            {models.map((model) => {
-                                const active = selectedModel.id === model.id;
-                                const itemClass = [
-                                    "w-full flex items-start justify-between p-2.5 rounded-xl text-left transition cursor-pointer",
-                                    active
-                                        ? "bg-indigo-600/25 border border-indigo-500/40 text-white"
-                                        : "hover:bg-slate-800/80 text-slate-300",
-                                ].join(" ");
-
-                                return (
-                                    <button
-                                        key={model.id}
-                                        onClick={() => {
-                                            onSelectModel(model);
-                                            setOpenDropdown(null);
-                                        }}
-                                        className={itemClass}
-                                    >
-                                        <div>
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-xs font-semibold">
-                                                    {model.name}
-                                                </span>
-                                                <span className="px-1.5 py-0.5 text-[10px] rounded bg-emerald-500/15 text-emerald-300 font-medium">
-                                                    {model.badge}
-                                                </span>
+                            <div className="mt-1 space-y-1">
+                                {availableModels.map((model) => {
+                                    const active = selectedModel === model.id;
+                                    return (
+                                        <button
+                                            key={model.id}
+                                            type="button"
+                                            onClick={() => {
+                                                setSelectedModel(model.id);
+                                                setOpenDropdown(null);
+                                            }}
+                                            className={`w-full p-2.5 rounded-xl text-left flex items-start justify-between gap-2 transition-all cursor-pointer ${active
+                                                    ? "bg-indigo-600/25 border border-indigo-500/40 text-white"
+                                                    : "hover:bg-slate-800/80 text-slate-300"
+                                                }`}
+                                        >
+                                            <div className="min-w-0">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-xs font-semibold truncate">
+                                                        {model.name}
+                                                    </span>
+                                                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 shrink-0">
+                                                        {model.badge}
+                                                    </span>
+                                                </div>
+                                                <p className="text-[11px] text-slate-400 mt-0.5">
+                                                    {model.description}
+                                                </p>
                                             </div>
-                                            <p className="text-[11px] text-slate-400 mt-0.5">
-                                                {model.description}
-                                            </p>
-                                        </div>
-                                        {active && (
-                                            <Check className="w-4 h-4 text-indigo-400 shrink-0 mt-1" />
-                                        )}
-                                    </button>
-                                );
-                            })}
+                                            {active && (
+                                                <Check className="w-4 h-4 text-indigo-400 shrink-0 mt-1" />
+                                            )}
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
                     )}
                 </div>
 
-                {/* 2. Persona Dropdown */}
+                {/* 2. Persona Selector Dropdown */}
                 <div className="relative">
                     <button
+                        type="button"
                         onClick={() =>
                             setOpenDropdown(openDropdown === "persona" ? null : "persona")
                         }
-                        className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 text-xs text-slate-100 transition cursor-pointer"
+                        className="px-3.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-indigo-500/25 text-xs font-medium text-slate-200 flex items-center gap-2 transition-all cursor-pointer"
                     >
-                        <PersonaIcon className="w-3.5 h-3.5 text-violet-400" />
-                        <span className="font-medium">{selectedPersona.name}</span>
+                        <span className="text-indigo-400">
+                            {renderPersonaIcon(currentPersona.iconType)}
+                        </span>
+                        <span className="hidden md:inline">{currentPersona.name}</span>
                         <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
                     </button>
 
                     {openDropdown === "persona" && (
-                        <div className="absolute left-0 mt-2 w-80 rounded-2xl bg-slate-900/95 backdrop-blur-2xl border border-slate-700 shadow-2xl p-2 z-50 space-y-1">
-                            <div className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-                                Select Agent Role & Persona
+                        <div className="absolute left-0 mt-2 w-72 rounded-2xl bg-slate-900/95 backdrop-blur-2xl border border-indigo-500/30 shadow-2xl p-2 z-50">
+                            <div className="px-3 py-2 border-b border-slate-800">
+                                <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                                    Switch AI Persona
+                                </p>
                             </div>
-                            {PERSONAS.map((persona) => {
-                                const Icon = persona.icon;
-                                const active = selectedPersona.id === persona.id;
-                                const itemClass = [
-                                    "w-full flex items-start gap-3 p-2.5 rounded-xl text-left transition cursor-pointer",
-                                    active
-                                        ? "bg-indigo-600/25 border border-indigo-500/40 text-white"
-                                        : "hover:bg-slate-800/80 text-slate-300",
-                                ].join(" ");
-
-                                return (
-                                    <button
-                                        key={persona.id}
-                                        onClick={() => {
-                                            onSelectPersona(persona);
-                                            setOpenDropdown(null);
-                                        }}
-                                        className={itemClass}
-                                    >
-                                        <div className="p-2 rounded-lg bg-slate-800 text-indigo-400 shrink-0">
-                                            <Icon className="w-4 h-4" />
-                                        </div>
-                                        <div className="flex-1">
-                                            <div className="text-xs font-semibold">
-                                                {persona.name}
+                            <div className="mt-1 space-y-1">
+                                {PERSONAS.map((persona) => {
+                                    const active = selectedPersona === persona.id;
+                                    return (
+                                        <button
+                                            key={persona.id}
+                                            type="button"
+                                            onClick={() => {
+                                                setSelectedPersona(persona.id);
+                                                setOpenDropdown(null);
+                                            }}
+                                            className={`w-full p-2.5 rounded-xl text-left flex items-center justify-between gap-2 transition-all cursor-pointer ${active
+                                                    ? "bg-indigo-600/25 border border-indigo-500/40 text-white"
+                                                    : "hover:bg-slate-800/80 text-slate-300"
+                                                }`}
+                                        >
+                                            <div className="flex items-center gap-2.5">
+                                                <span className="text-indigo-400">
+                                                    {renderPersonaIcon(persona.iconType)}
+                                                </span>
+                                                <div>
+                                                    <p className="text-xs font-semibold">
+                                                        {persona.name}
+                                                    </p>
+                                                    <p className="text-[10px] text-slate-400">
+                                                        {persona.role}
+                                                    </p>
+                                                </div>
                                             </div>
-                                            <p className="text-[11px] text-slate-400 mt-0.5">
-                                                {persona.description}
-                                            </p>
-                                        </div>
-                                        {active && (
-                                            <Check className="w-4 h-4 text-indigo-400 shrink-0 mt-1" />
-                                        )}
-                                    </button>
-                                );
-                            })}
+                                            {active && <Check className="w-4 h-4 text-indigo-400" />}
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
                     )}
                 </div>
 
-                {/* 3. Language Dropdown */}
+                {/* 3. Language Selector Dropdown */}
                 <div className="relative">
                     <button
+                        type="button"
                         onClick={() =>
                             setOpenDropdown(openDropdown === "language" ? null : "language")
                         }
-                        className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 text-xs text-slate-100 transition cursor-pointer"
+                        className="px-3.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-indigo-500/25 text-xs font-medium text-slate-200 flex items-center gap-2 transition-all cursor-pointer"
                     >
-                        <Globe className="w-3.5 h-3.5 text-emerald-400" />
-                        <span className="font-medium">{selectedLanguage.name}</span>
+                        <Globe className="w-4 h-4 text-indigo-400" />
+                        <span className="hidden sm:inline">{currentLanguage.label}</span>
                         <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
                     </button>
 
                     {openDropdown === "language" && (
-                        <div className="absolute left-0 mt-2 w-64 rounded-2xl bg-slate-900/95 backdrop-blur-2xl border border-slate-700 shadow-2xl p-2 z-50 space-y-1">
-                            <div className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-                                Voice & Chat Language
+                        <div className="absolute left-0 mt-2 w-64 rounded-2xl bg-slate-900/95 backdrop-blur-2xl border border-indigo-500/30 shadow-2xl p-2 z-50">
+                            <div className="px-3 py-2 border-b border-slate-800">
+                                <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                                    Voice & Chat Language
+                                </p>
                             </div>
-                            {LANGUAGES.map((lang) => {
-                                const active = selectedLanguage.id === lang.id;
-                                const itemClass = [
-                                    "w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition cursor-pointer",
-                                    active
-                                        ? "bg-indigo-600/25 border border-indigo-500/40 text-white font-semibold"
-                                        : "hover:bg-slate-800/80 text-slate-300",
-                                ].join(" ");
-
-                                return (
-                                    <button
-                                        key={lang.id}
-                                        onClick={() => {
-                                            onSelectLanguage(lang);
-                                            setOpenDropdown(null);
-                                        }}
-                                        className={itemClass}
-                                    >
-                                        <div className="flex items-center gap-2">
-                                            <span className="px-1.5 py-0.5 text-[10px] rounded bg-slate-800 text-slate-300 font-mono">
-                                                {lang.badge}
-                                            </span>
-                                            <span>{lang.name}</span>
-                                        </div>
-                                        {active && <Check className="w-4 h-4 text-indigo-400" />}
-                                    </button>
-                                );
-                            })}
+                            <div className="mt-1 space-y-1">
+                                {LANGUAGES.map((lang) => {
+                                    const active = selectedLanguage === lang.code;
+                                    return (
+                                        <button
+                                            key={lang.code}
+                                            type="button"
+                                            onClick={() => {
+                                                setSelectedLanguage(lang.code);
+                                                setOpenDropdown(null);
+                                            }}
+                                            className={`w-full p-2.5 rounded-xl text-left flex items-center justify-between transition-all cursor-pointer ${active
+                                                    ? "bg-indigo-600/25 border border-indigo-500/40 text-white"
+                                                    : "hover:bg-slate-800/80 text-slate-300"
+                                                }`}
+                                        >
+                                            <div>
+                                                <p className="text-xs font-semibold">{lang.label}</p>
+                                                <p className="text-[10px] text-slate-400">
+                                                    {lang.region} ({lang.code})
+                                                </p>
+                                            </div>
+                                            {active && <Check className="w-4 h-4 text-indigo-400" />}
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
                     )}
                 </div>
             </div>
 
-            {/* Right Action Controls */}
-            <div className="flex items-center gap-2">
+            {/* Right Action Bar */}
+            <div className="flex items-center gap-2.5">
                 {!user ? (
-                    <button
-                        onClick={onOpenAuth}
-                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-xs font-medium text-indigo-300 transition cursor-pointer"
+                    <Link
+                        href="/login"
+                        className="hidden sm:flex px-3.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-indigo-500/25 text-xs font-medium text-indigo-300 items-center gap-1.5 transition-all cursor-pointer"
                     >
                         <LogIn className="w-3.5 h-3.5" />
-                        <span className="hidden sm:inline">Sign In</span>
-                    </button>
+                        <span>Sign In</span>
+                    </Link>
                 ) : (
-                    <div className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs text-emerald-300">
+                    <div className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-medium">
                         <UserCheck className="w-3.5 h-3.5" />
-                        <span>{user.name}</span>
+                        <span className="truncate max-w-[110px]">{user.name}</span>
                     </div>
                 )}
 
+                {/* Mute Button */}
                 <button
-                    onClick={onToggleMute}
-                    title={isMuted ? "Unmute Audio Output" : "Mute Audio Output"}
-                    className="p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-300 transition cursor-pointer"
+                    type="button"
+                    onClick={() => {
+                        const nextMute = !isMuted;
+                        setIsMuted(nextMute);
+                        if (nextMute) onStopSpeaking();
+                    }}
+                    title={isMuted ? "Unmute Voice Output" : "Mute Voice Output"}
+                    className={`p-2.5 rounded-xl border transition-all cursor-pointer ${isMuted
+                            ? "bg-rose-500/15 border-rose-500/40 text-rose-300 hover:bg-rose-500/25"
+                            : "bg-slate-900/90 border-indigo-500/25 text-emerald-400 hover:bg-slate-800"
+                        }`}
                 >
                     {isMuted ? (
-                        <VolumeX className="w-4 h-4 text-rose-400" />
+                        <VolumeX className="w-4 h-4" />
                     ) : (
-                        <Volume2 className="w-4 h-4 text-emerald-400" />
+                        <Volume2 className="w-4 h-4" />
                     )}
                 </button>
 
-                {/* 4. Options Dropdown */}
+                {/* 4. Workspace Settings Dropdown */}
                 <div className="relative">
                     <button
+                        type="button"
                         onClick={() =>
                             setOpenDropdown(openDropdown === "settings" ? null : "settings")
                         }
-                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-medium transition cursor-pointer"
+                        className="px-3 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-indigo-500/25 text-xs font-medium text-slate-200 flex items-center gap-2 transition-all cursor-pointer"
                     >
-                        <Sliders className="w-4 h-4 text-indigo-400" />
+                        <SlidersHorizontal className="w-4 h-4 text-indigo-400" />
                         <span className="hidden sm:inline">Options</span>
-                        <ChevronDown className="w-3.5 h-3.5" />
+                        <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
                     </button>
 
                     {openDropdown === "settings" && (
-                        <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-slate-900/95 backdrop-blur-2xl border border-slate-700 shadow-2xl p-2 z-50 space-y-1">
-                            <div className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                                <Gauge className="w-3.5 h-3.5 text-indigo-400" />
-                                <span>Voice Playback Speed</span>
+                        <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-slate-900/95 backdrop-blur-2xl border border-indigo-500/30 shadow-2xl p-3 z-50 space-y-3">
+                            <div className="px-2 py-1 border-b border-slate-800">
+                                <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                                    Voice & Workspace Settings
+                                </p>
                             </div>
-                            <div className="grid grid-cols-2 gap-1 px-2 pb-2">
-                                {SPEECH_RATES.map((rate) => {
-                                    const active = speechRate === rate.value;
-                                    const rateClass = [
-                                        "px-2.5 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer flex items-center justify-between",
-                                        active
-                                            ? "bg-indigo-600 text-white"
-                                            : "bg-slate-800/80 text-slate-300 hover:bg-slate-700",
-                                    ].join(" ");
 
-                                    return (
+                            <div className="px-2">
+                                <div className="flex items-center gap-1.5 text-xs text-slate-300 mb-2">
+                                    <Gauge className="w-3.5 h-3.5 text-indigo-400" />
+                                    <span>Voice Playback Speed</span>
+                                </div>
+                                <div className="grid grid-cols-2 gap-1.5">
+                                    {SPEECH_RATES.map((rate) => (
                                         <button
                                             key={rate.value}
-                                            onClick={() => onSelectSpeechRate(rate.value)}
-                                            className={rateClass}
+                                            type="button"
+                                            onClick={() => setSpeechRate(rate.value)}
+                                            className={`px-2.5 py-1.5 rounded-lg text-[11px] font-medium border transition-all cursor-pointer ${speechRate === rate.value
+                                                    ? "bg-indigo-600/30 border-indigo-500 text-white"
+                                                    : "bg-slate-800/70 border-slate-700/70 text-slate-400 hover:text-white"
+                                                }`}
                                         >
-                                            <span>{rate.label}</span>
-                                            {active && <Check className="w-3 h-3" />}
+                                            {rate.label}
                                         </button>
-                                    );
-                                })}
+                                    ))}
+                                </div>
                             </div>
 
-                            <div className="border-t border-slate-800 my-1" />
+                            <div className="px-2 pt-1 border-t border-slate-800/80">
+                                <button
+                                    type="button"
+                                    onClick={() => setAutoSpeakReplies(!autoSpeakReplies)}
+                                    className="w-full py-2 px-2.5 rounded-xl hover:bg-slate-800/70 flex items-center justify-between text-xs text-slate-200 transition-colors cursor-pointer"
+                                >
+                                    <span>Auto-Read Chat Replies</span>
+                                    <span
+                                        className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${autoSpeakReplies
+                                                ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                                                : "bg-slate-800 text-slate-400"
+                                            }`}
+                                    >
+                                        {autoSpeakReplies ? "ON" : "OFF"}
+                                    </span>
+                                </button>
+                            </div>
 
-                            <button
-                                onClick={onToggleAutoSpeak}
-                                className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs text-slate-200 hover:bg-slate-800/80 transition cursor-pointer"
-                            >
-                                <span className="flex items-center gap-2">
-                                    <Volume2 className="w-4 h-4 text-indigo-400" />
-                                    <span>Auto-Read Text Replies</span>
-                                </span>
-                                <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-slate-800 text-indigo-300">
-                                    {autoSpeakChat ? "ON" : "OFF"}
-                                </span>
-                            </button>
-
-                            <button
-                                onClick={onExportTranscript}
-                                disabled={!hasMessages}
-                                className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs text-slate-200 hover:bg-slate-800/80 disabled:opacity-40 transition cursor-pointer"
-                            >
-                                <Download className="w-4 h-4 text-indigo-400" />
-                                <span>Export Chat Transcript (.txt)</span>
-                            </button>
-
-                            <button
-                                onClick={onClearChat}
-                                disabled={!hasMessages}
-                                className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs text-rose-300 hover:bg-rose-500/10 disabled:opacity-40 transition cursor-pointer"
-                            >
-                                <Trash2 className="w-4 h-4 text-rose-400" />
-                                <span>Clear Current Screen</span>
-                            </button>
+                            <div className="px-2 pt-1 border-t border-slate-800/80 space-y-1">
+                                <button
+                                    type="button"
+                                    onClick={onExportTranscript}
+                                    className="w-full py-2 px-2.5 rounded-xl hover:bg-slate-800/70 flex items-center gap-2.5 text-xs text-slate-200 transition-colors cursor-pointer"
+                                >
+                                    <Download className="w-3.5 h-3.5 text-indigo-400" />
+                                    <span>Download Transcript (.txt)</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={onClearConversation}
+                                    className="w-full py-2 px-2.5 rounded-xl hover:bg-rose-500/15 flex items-center gap-2.5 text-xs text-rose-300 transition-colors cursor-pointer"
+                                >
+                                    <Trash2 className="w-3.5 h-3.5 text-rose-400" />
+                                    <span>Clear Conversation</span>
+                                </button>
+                            </div>
                         </div>
                     )}
                 </div>
 
-                {/* Voice Call Button */}
+                {/* Live Voice Call Start/End CTA */}
                 {!isCallActive ? (
                     <button
-                        onClick={onStartCall}
-                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-linear-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white text-xs font-semibold shadow-lg shadow-emerald-600/25 transition cursor-pointer"
+                        type="button"
+                        onClick={onStartVoiceCall}
+                        className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-xs shadow-lg shadow-emerald-600/25 flex items-center gap-2 transition-all cursor-pointer active:scale-95"
                     >
-                        <Phone className="w-4 h-4" />
+                        <PhoneCall className="w-4 h-4" />
                         <span>Start Voice Call</span>
                     </button>
                 ) : (
                     <button
-                        onClick={onEndCall}
-                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-linear-to-r from-rose-500 to-red-600 hover:from-rose-400 hover:to-red-500 text-white text-xs font-semibold shadow-lg shadow-rose-600/30 animate-pulse transition cursor-pointer"
+                        type="button"
+                        onClick={onEndVoiceCall}
+                        className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-semibold text-xs shadow-lg shadow-rose-600/30 flex items-center gap-2 transition-all cursor-pointer animate-pulse"
                     >
                         <PhoneOff className="w-4 h-4" />
                         <span>End Call</span>
