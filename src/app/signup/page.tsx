@@ -83,7 +83,7 @@ export default function SignupPage() {
     };
 
     return (
-        <div className="min-h-screen w-full overflow-y-auto bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 text-slate-100 flex items-center justify-center p-4 sm:p-6 relative">
+        <div className="min-h-screen w-full overflow-y-auto bg-linear-to-br from-slate-950 via-indigo-950 to-slate-900 text-slate-100 flex items-center justify-center p-4 sm:p-6 relative">
             {/* Ambient Glow */}
             <div className="pointer-events-none fixed inset-0 overflow-hidden z-0">
                 <div className="absolute -top-40 -right-40 w-80 sm:w-96 h-80 sm:h-96 bg-indigo-600/20 rounded-full blur-[130px]" />
@@ -92,7 +92,7 @@ export default function SignupPage() {
 
             <div className="relative z-10 w-full max-w-4xl grid grid-cols-1 lg:grid-cols-12 bg-slate-900/85 backdrop-blur-2xl border border-indigo-500/25 rounded-3xl shadow-[0_25px_70px_rgba(0,0,0,0.75)] overflow-hidden my-auto">
                 {/* Left Brand Panel */}
-                <div className="hidden lg:flex lg:col-span-5 flex-col justify-between p-8 bg-gradient-to-br from-indigo-600/20 via-purple-600/15 to-slate-900/60 border-r border-indigo-500/20">
+                <div className="hidden lg:flex lg:col-span-5 flex-col justify-between p-8 bg-linear-to-br from-indigo-600/20 via-purple-600/15 to-slate-900/60 border-r border-indigo-500/20">
                     <div>
                         <Link
                             href="/"
@@ -103,7 +103,7 @@ export default function SignupPage() {
                         </Link>
 
                         <div className="flex items-center gap-3 mb-6">
-                            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-violet-600 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/30 border border-indigo-400/30 shrink-0">
+                            <div className="w-11 h-11 rounded-2xl bg-linear-to-tr from-indigo-600 via-violet-600 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/30 border border-indigo-400/30 shrink-0">
                                 <Sparkles className="w-5 h-5 text-white" />
                             </div>
                             <div>
@@ -247,7 +247,7 @@ export default function SignupPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold text-sm shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 mt-2"
+                            className="w-full py-3.5 rounded-xl bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold text-sm shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 mt-2"
                         >
                             {loading ? (
                                 <Loader2 className="w-4 h-4 animate-spin" />
