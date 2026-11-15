@@ -260,13 +260,13 @@ export default function TopNavbar({
                             </div>
                             <div className="mt-1 space-y-1">
                                 {LANGUAGES.map((lang) => {
-                                    const active = selectedLanguage === (lang.code as unknown as string);
+                                    const active = selectedLanguage === lang.id;
                                     return (
                                         <button
-                                            key={lang.code}
+                                            key={lang.id}
                                             type="button"
                                             onClick={() => {
-                                                setSelectedLanguage(lang.code);
+                                                setSelectedLanguage(lang.id);
                                                 setOpenDropdown(null);
                                             }}
                                             className={`w-full p-2.5 rounded-xl text-left flex items-center justify-between transition-all cursor-pointer ${active
@@ -275,10 +275,8 @@ export default function TopNavbar({
                                                 }`}
                                         >
                                             <div>
-                                                <p className="text-xs font-semibold">{lang.label}</p>
-                                                <p className="text-[10px] text-slate-400">
-                                                    {lang.region} ({lang.code})
-                                                </p>
+                                                <p className="text-xs font-semibold">{lang.name}</p>
+                                                <p className="text-[10px] text-slate-400">{lang.badge}</p>
                                             </div>
                                             {active && <Check className="w-4 h-4 text-indigo-400" />}
                                         </button>
