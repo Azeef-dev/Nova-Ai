@@ -92,225 +92,240 @@ export default function TopNavbar({
     return (
         <header
             ref={dropdownContainerRef}
-            className="min-h-16 px-2 sm:px-4 py-2.5 bg-slate-950/80 backdrop-blur-xl border-b border-indigo-500/20 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 shrink-0 z-30"
+            className="px-2.5 sm:px-4 py-2 bg-slate-950/85 backdrop-blur-xl border-b border-indigo-500/20 flex flex-col xl:flex-row items-center justify-between gap-2 shrink-0 z-30 shadow-md"
         >
-            {/* LEFT GROUP — Sidebar toggle + Selector dropdowns */}
-            <div className="flex items-center gap-1.5 min-w-0 flex-wrap sm:flex-nowrap">
-                {!isSidebarOpen && (
-                    <button
-                        type="button"
-                        onClick={() => setIsSidebarOpen(true)}
-                        title="Open Sidebar"
-                        className="p-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white border border-indigo-500/20 transition-all cursor-pointer shrink-0"
-                    >
-                        <PanelLeftOpen className="w-4 h-4" />
-                    </button>
-                )}
-
-                {/* 1. AI Model Selector Dropdown */}
-                <div className="relative">
-                    <button
-                        type="button"
-                        onClick={() =>
-                            setOpenDropdown(openDropdown === "model" ? null : "model")
-                        }
-                        className="px-2 sm:px-3 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-indigo-500/25 text-xs font-medium text-slate-200 flex items-center gap-1 transition-all cursor-pointer"
-                    >
-                        <Cpu className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-400 shrink-0" />
-                        <span className="truncate max-w-20 sm:max-w-28 md:max-w-36">
-                            {currentModel.name}
-                        </span>
-                        <ChevronDown className="w-3 h-3 text-slate-400 shrink-0" />
-                    </button>
-
-                    {openDropdown === "model" && (
-                        <div className="absolute left-0 mt-2 w-72 sm:w-80 rounded-2xl bg-slate-900/95 backdrop-blur-2xl border border-indigo-500/30 shadow-2xl p-2 z-50 max-h-96 overflow-y-auto custom-scrollbar">
-                            <div className="px-3 py-2 border-b border-slate-800 flex items-center justify-between">
-                                <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-                                    Groq Free Tier Models
-                                </p>
-                                <span className="text-[10px] text-emerald-400 font-medium">
-                                    Auto-Fallback Ready
-                                </span>
-                            </div>
-                            <div className="mt-1 space-y-1">
-                                {availableModels.length === 0 && (
-                                    <div className="px-3 py-3 text-[11px] text-slate-500">
-                                        No active chat models found on this Groq key.
-                                    </div>
-                                )}
-                                {availableModels.map((model) => {
-                                    const active = selectedModel === model.id;
-                                    return (
-                                        <button
-                                            key={model.id}
-                                            type="button"
-                                            onClick={() => {
-                                                setSelectedModel(model.id);
-                                                setOpenDropdown(null);
-                                            }}
-                                            className={`w-full p-2.5 rounded-xl text-left flex items-start justify-between gap-2 transition-all cursor-pointer ${active
-                                                    ? "bg-indigo-600/25 border border-indigo-500/40 text-white"
-                                                    : "hover:bg-slate-800/80 text-slate-300"
-                                                }`}
-                                        >
-                                            <div className="min-w-0">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-xs font-semibold truncate">
-                                                        {model.name}
-                                                    </span>
-                                                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 shrink-0">
-                                                        {model.badge}
-                                                    </span>
-                                                </div>
-                                                <p className="text-[11px] text-slate-400 mt-0.5">
-                                                    {model.description}
-                                                </p>
-                                            </div>
-                                            {active && (
-                                                <Check className="w-4 h-4 text-indigo-400 shrink-0 mt-1" />
-                                            )}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        </div>
+            {/* ROW 1 (Mobile) / LEFT GROUP (Desktop) — Sidebar toggle + Selector Dropdowns */}
+            <div className="w-full xl:w-auto flex items-center justify-between xl:justify-start gap-1.5 sm:gap-2">
+                <div className="flex items-center gap-1.5 min-w-0">
+                    {!isSidebarOpen && (
+                        <button
+                            type="button"
+                            onClick={() => setIsSidebarOpen(true)}
+                            title="Open Sidebar"
+                            className="p-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white border border-indigo-500/20 transition-all cursor-pointer shrink-0"
+                        >
+                            <PanelLeftOpen className="w-4 h-4" />
+                        </button>
                     )}
-                </div>
 
-                {/* 2. Persona Selector Dropdown */}
-                <div className="relative">
-                    <button
-                        type="button"
-                        onClick={() =>
-                            setOpenDropdown(openDropdown === "persona" ? null : "persona")
-                        }
-                        className="px-2 sm:px-3 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-indigo-500/25 text-xs font-medium text-slate-200 flex items-center gap-1 transition-all cursor-pointer"
-                    >
-                        <span className="text-indigo-400 shrink-0">
-                            <currentPersona.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                        </span>
-                        <span className="hidden md:inline truncate max-w-28">
-                            {currentPersona.name}
-                        </span>
-                        <ChevronDown className="w-3 h-3 text-slate-400 shrink-0" />
-                    </button>
+                    {/* 1. AI Model Selector Dropdown */}
+                    <div className="relative">
+                        <button
+                            type="button"
+                            onClick={() =>
+                                setOpenDropdown(openDropdown === "model" ? null : "model")
+                            }
+                            className="px-2.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-indigo-500/25 text-xs font-medium text-slate-200 flex items-center gap-1.5 transition-all cursor-pointer"
+                        >
+                            <Cpu className="w-4 h-4 text-indigo-400 shrink-0" />
+                            <span className="truncate max-w-24 sm:max-w-32 md:max-w-40">
+                                {currentModel.name}
+                            </span>
+                            <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        </button>
 
-                    {openDropdown === "persona" && (
-                        <div className="absolute left-0 mt-2 w-72 rounded-2xl bg-slate-900/95 backdrop-blur-2xl border border-indigo-500/30 shadow-2xl p-2 z-50">
-                            <div className="px-3 py-2 border-b border-slate-800">
-                                <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-                                    Switch AI Persona
-                                </p>
-                            </div>
-                            <div className="mt-1 space-y-1">
-                                {PERSONAS.map((persona) => {
-                                    const active = selectedPersona === persona.id;
-                                    return (
-                                        <button
-                                            key={persona.id}
-                                            type="button"
-                                            onClick={() => {
-                                                setSelectedPersona(persona.id);
-                                                setOpenDropdown(null);
-                                            }}
-                                            className={`w-full p-2.5 rounded-xl text-left flex items-center justify-between gap-2 transition-all cursor-pointer ${active
+                        {openDropdown === "model" && (
+                            <div className="absolute left-0 mt-2 w-72 sm:w-80 rounded-2xl bg-slate-900/95 backdrop-blur-2xl border border-indigo-500/30 shadow-2xl p-2 z-50 max-h-96 overflow-y-auto custom-scrollbar">
+                                <div className="px-3 py-2 border-b border-slate-800 flex items-center justify-between">
+                                    <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                                        Groq Free Tier Models
+                                    </p>
+                                    <span className="text-[10px] text-emerald-400 font-medium">
+                                        Auto-Fallback Ready
+                                    </span>
+                                </div>
+                                <div className="mt-1 space-y-1">
+                                    {availableModels.length === 0 && (
+                                        <div className="px-3 py-3 text-[11px] text-slate-500">
+                                            No active chat models found on this Groq key.
+                                        </div>
+                                    )}
+                                    {availableModels.map((model) => {
+                                        const active = selectedModel === model.id;
+                                        return (
+                                            <button
+                                                key={model.id}
+                                                type="button"
+                                                onClick={() => {
+                                                    setSelectedModel(model.id);
+                                                    setOpenDropdown(null);
+                                                }}
+                                                className={`w-full p-2.5 rounded-xl text-left flex items-start justify-between gap-2 transition-all cursor-pointer ${active
                                                     ? "bg-indigo-600/25 border border-indigo-500/40 text-white"
                                                     : "hover:bg-slate-800/80 text-slate-300"
-                                                }`}
-                                        >
-                                            <div className="flex items-center gap-2.5 min-w-0">
-                                                <span className="text-indigo-400 shrink-0">
-                                                    <persona.icon className="w-4 h-4" />
-                                                </span>
+                                                    }`}
+                                            >
                                                 <div className="min-w-0">
-                                                    <p className="text-xs font-semibold truncate">
-                                                        {persona.name}
-                                                    </p>
-                                                    <p className="text-[10px] text-slate-400 truncate">
-                                                        {persona.description}
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-xs font-semibold truncate">
+                                                            {model.name}
+                                                        </span>
+                                                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 shrink-0">
+                                                            {model.badge}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-[11px] text-slate-400 mt-0.5">
+                                                        {model.description}
                                                     </p>
                                                 </div>
-                                            </div>
-                                            {active && <Check className="w-4 h-4 text-indigo-400 shrink-0" />}
-                                        </button>
-                                    );
-                                })}
+                                                {active && (
+                                                    <Check className="w-4 h-4 text-indigo-400 shrink-0 mt-1" />
+                                                )}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
                             </div>
-                        </div>
-                    )}
-                </div>
+                        )}
+                    </div>
 
-                {/* 3. Language Selector Dropdown */}
-                <div className="relative">
-                    <button
-                        type="button"
-                        onClick={() =>
-                            setOpenDropdown(openDropdown === "language" ? null : "language")
-                        }
-                        className="px-2 sm:px-3 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-indigo-500/25 text-xs font-medium text-slate-200 flex items-center gap-1 transition-all cursor-pointer"
-                    >
-                        <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-400 shrink-0" />
-                        <span className="hidden sm:inline truncate max-w-20">
-                            {currentLanguage.name}
-                        </span>
-                        <ChevronDown className="w-3 h-3 text-slate-400 shrink-0" />
-                    </button>
+                    {/* 2. Persona Selector Dropdown */}
+                    <div className="relative">
+                        <button
+                            type="button"
+                            onClick={() =>
+                                setOpenDropdown(openDropdown === "persona" ? null : "persona")
+                            }
+                            className="px-2.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-indigo-500/25 text-xs font-medium text-slate-200 flex items-center gap-1.5 transition-all cursor-pointer"
+                        >
+                            <span className="text-indigo-400 shrink-0">
+                                <currentPersona.icon className="w-4 h-4" />
+                            </span>
+                            <span className="hidden sm:inline truncate max-w-28 md:max-w-36">
+                                {currentPersona.name}
+                            </span>
+                            <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        </button>
 
-                    {openDropdown === "language" && (
-                        <div className="absolute left-0 mt-2 w-64 rounded-2xl bg-slate-900/95 backdrop-blur-2xl border border-indigo-500/30 shadow-2xl p-2 z-50">
-                            <div className="px-3 py-2 border-b border-slate-800">
-                                <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-                                    Voice & Chat Language
-                                </p>
-                            </div>
-                            <div className="mt-1 space-y-1">
-                                {LANGUAGES.map((lang) => {
-                                    const active = selectedLanguage === lang.id;
-                                    return (
-                                        <button
-                                            key={lang.id}
-                                            type="button"
-                                            onClick={() => {
-                                                setSelectedLanguage(lang.id);
-                                                setOpenDropdown(null);
-                                            }}
-                                            className={`w-full p-2.5 rounded-xl text-left flex items-center justify-between transition-all cursor-pointer ${active
+                        {openDropdown === "persona" && (
+                            <div className="absolute left-0 mt-2 w-72 rounded-2xl bg-slate-900/95 backdrop-blur-2xl border border-indigo-500/30 shadow-2xl p-2 z-50">
+                                <div className="px-3 py-2 border-b border-slate-800">
+                                    <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                                        Switch AI Persona
+                                    </p>
+                                </div>
+                                <div className="mt-1 space-y-1">
+                                    {PERSONAS.map((persona) => {
+                                        const active = selectedPersona === persona.id;
+                                        return (
+                                            <button
+                                                key={persona.id}
+                                                type="button"
+                                                onClick={() => {
+                                                    setSelectedPersona(persona.id);
+                                                    setOpenDropdown(null);
+                                                }}
+                                                className={`w-full p-2.5 rounded-xl text-left flex items-center justify-between gap-2 transition-all cursor-pointer ${active
                                                     ? "bg-indigo-600/25 border border-indigo-500/40 text-white"
                                                     : "hover:bg-slate-800/80 text-slate-300"
-                                                }`}
-                                        >
-                                            <div>
-                                                <p className="text-xs font-semibold">{lang.name}</p>
-                                                <p className="text-[10px] text-slate-400">
-                                                    {lang.badge}
-                                                </p>
-                                            </div>
-                                            {active && <Check className="w-4 h-4 text-indigo-400" />}
-                                        </button>
-                                    );
-                                })}
+                                                    }`}
+                                            >
+                                                <div className="flex items-center gap-2.5 min-w-0">
+                                                    <span className="text-indigo-400 shrink-0">
+                                                        <persona.icon className="w-4 h-4" />
+                                                    </span>
+                                                    <div className="min-w-0">
+                                                        <p className="text-xs font-semibold truncate">
+                                                            {persona.name}
+                                                        </p>
+                                                        <p className="text-[10px] text-slate-400 truncate">
+                                                            {persona.description}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                {active && <Check className="w-4 h-4 text-indigo-400 shrink-0" />}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
                             </div>
+                        )}
+                    </div>
+
+                    {/* 3. Language Selector Dropdown */}
+                    <div className="relative">
+                        <button
+                            type="button"
+                            onClick={() =>
+                                setOpenDropdown(openDropdown === "language" ? null : "language")
+                            }
+                            className="px-2.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-indigo-500/25 text-xs font-medium text-slate-200 flex items-center gap-1.5 transition-all cursor-pointer"
+                        >
+                            <Globe className="w-4 h-4 text-indigo-400 shrink-0" />
+                            <span className="hidden sm:inline truncate max-w-24">
+                                {currentLanguage.name}
+                            </span>
+                            <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        </button>
+
+                        {openDropdown === "language" && (
+                            <div className="absolute left-0 mt-2 w-64 rounded-2xl bg-slate-900/95 backdrop-blur-2xl border border-indigo-500/30 shadow-2xl p-2 z-50">
+                                <div className="px-3 py-2 border-b border-slate-800">
+                                    <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                                        Voice & Chat Language
+                                    </p>
+                                </div>
+                                <div className="mt-1 space-y-1">
+                                    {LANGUAGES.map((lang) => {
+                                        const active = selectedLanguage === lang.id;
+                                        return (
+                                            <button
+                                                key={lang.id}
+                                                type="button"
+                                                onClick={() => {
+                                                    setSelectedLanguage(lang.id);
+                                                    setOpenDropdown(null);
+                                                }}
+                                                className={`w-full p-2.5 rounded-xl text-left flex items-center justify-between transition-all cursor-pointer ${active
+                                                    ? "bg-indigo-600/25 border border-indigo-500/40 text-white"
+                                                    : "hover:bg-slate-800/80 text-slate-300"
+                                                    }`}
+                                            >
+                                                <div>
+                                                    <p className="text-xs font-semibold">{lang.name}</p>
+                                                    <p className="text-[10px] text-slate-400">
+                                                        {lang.badge}
+                                                    </p>
+                                                </div>
+                                                {active && <Check className="w-4 h-4 text-indigo-400" />}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Desktop Sign In / User Badge */}
+                <div className="hidden xl:flex items-center">
+                    {!user ? (
+                        <Link
+                            href="/login"
+                            className="px-3 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-indigo-500/25 text-xs font-medium text-indigo-300 flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
+                        >
+                            <LogIn className="w-3.5 h-3.5" />
+                            <span>Sign In</span>
+                        </Link>
+                    ) : (
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-medium shrink-0">
+                            <UserCheck className="w-3.5 h-3.5" />
+                            <span className="truncate max-w-28">{user.name}</span>
                         </div>
                     )}
                 </div>
             </div>
 
-            {/* RIGHT GROUP — Sign In / Mute / Options / Call */}
-            <div className="flex items-center gap-1.5 shrink-0 ml-auto">
-                {!user ? (
+            {/* ROW 2 (Mobile) / RIGHT GROUP (Desktop) — Mute / Options / Call */}
+            <div className="w-full xl:w-auto flex items-center justify-end gap-1.5 sm:gap-2">
+                {!user && (
                     <Link
                         href="/login"
-                        className="hidden sm:flex px-2.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-indigo-500/25 text-xs font-medium text-indigo-300 items-center gap-1 transition-all cursor-pointer shrink-0"
+                        className="xl:hidden px-2.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-indigo-500/25 text-xs font-medium text-indigo-300 flex items-center gap-1 transition-all cursor-pointer shrink-0"
                     >
                         <LogIn className="w-3.5 h-3.5" />
                         <span>Sign In</span>
                     </Link>
-                ) : (
-                    <div className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-medium shrink-0">
-                        <UserCheck className="w-3.5 h-3.5" />
-                        <span className="truncate max-w-24">{user.name}</span>
-                    </div>
                 )}
 
                 {/* Mute Button */}
@@ -322,9 +337,9 @@ export default function TopNavbar({
                         if (nextMute) onStopSpeaking();
                     }}
                     title={isMuted ? "Unmute Voice Output" : "Mute Voice Output"}
-                    className={`p-2 rounded-xl border transition-all cursor-pointer shrink-0 ${isMuted
-                            ? "bg-rose-500/15 border-rose-500/40 text-rose-300 hover:bg-rose-500/25"
-                            : "bg-slate-900/90 border-indigo-500/25 text-emerald-400 hover:bg-slate-800"
+                    className={`p-2.5 rounded-xl border transition-all cursor-pointer shrink-0 ${isMuted
+                        ? "bg-rose-500/15 border-rose-500/40 text-rose-300 hover:bg-rose-500/25"
+                        : "bg-slate-900/90 border-indigo-500/25 text-emerald-400 hover:bg-slate-800"
                         }`}
                 >
                     {isMuted ? (
@@ -341,15 +356,15 @@ export default function TopNavbar({
                         onClick={() =>
                             setOpenDropdown(openDropdown === "settings" ? null : "settings")
                         }
-                        className="px-2 sm:px-3 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-indigo-500/25 text-xs font-medium text-slate-200 flex items-center gap-1 transition-all cursor-pointer"
+                        className="px-2.5 sm:px-3 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-indigo-500/25 text-xs font-medium text-slate-200 flex items-center gap-1.5 transition-all cursor-pointer"
                     >
-                        <SlidersHorizontal className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-400 shrink-0" />
+                        <SlidersHorizontal className="w-4 h-4 text-indigo-400 shrink-0" />
                         <span className="hidden sm:inline">Options</span>
-                        <ChevronDown className="w-3 h-3 text-slate-400 shrink-0" />
+                        <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                     </button>
 
                     {openDropdown === "settings" && (
-                        <div className="absolute right-0 mt-2 w-64 sm:w-72 rounded-2xl bg-slate-900/95 backdrop-blur-2xl border border-indigo-500/30 shadow-2xl p-3 z-50 space-y-3">
+                        <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-slate-900/95 backdrop-blur-2xl border border-indigo-500/30 shadow-2xl p-3 z-50 space-y-3">
                             <div className="px-2 py-1 border-b border-slate-800">
                                 <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
                                     Voice & Workspace Settings
@@ -367,9 +382,9 @@ export default function TopNavbar({
                                             key={rate.value}
                                             type="button"
                                             onClick={() => setSpeechRate(rate.value)}
-                                            className={`px-2 py-1.5 rounded-lg text-[11px] font-medium border transition-all cursor-pointer ${speechRate === rate.value
-                                                    ? "bg-indigo-600/30 border-indigo-500 text-white"
-                                                    : "bg-slate-800/70 border-slate-700/70 text-slate-400 hover:text-white"
+                                            className={`px-2.5 py-1.5 rounded-lg text-[11px] font-medium border transition-all cursor-pointer ${speechRate === rate.value
+                                                ? "bg-indigo-600/30 border-indigo-500 text-white"
+                                                : "bg-slate-800/70 border-slate-700/70 text-slate-400 hover:text-white"
                                                 }`}
                                         >
                                             {rate.label}
@@ -387,8 +402,8 @@ export default function TopNavbar({
                                     <span>Auto-Read Chat Replies</span>
                                     <span
                                         className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${autoSpeakReplies
-                                                ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
-                                                : "bg-slate-800 text-slate-400"
+                                            ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                                            : "bg-slate-800 text-slate-400"
                                             }`}
                                     >
                                         {autoSpeakReplies ? "ON" : "OFF"}
@@ -423,19 +438,18 @@ export default function TopNavbar({
                     <button
                         type="button"
                         onClick={onStartVoiceCall}
-                        className="px-2.5 sm:px-3.5 py-2 rounded-xl bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-xs shadow-lg shadow-emerald-600/25 flex items-center gap-1.5 transition-all cursor-pointer active:scale-95 shrink-0"
+                        className="px-3 sm:px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-xs shadow-lg shadow-emerald-600/25 flex items-center gap-1.5 sm:gap-2 transition-all cursor-pointer active:scale-95 shrink-0"
                     >
-                        <PhoneCall className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
-                        <span className="hidden sm:inline">Start Voice Call</span>
-                        <span className="sm:hidden">Call</span>
+                        <PhoneCall className="w-4 h-4 shrink-0" />
+                        <span>Start Voice Call</span>
                     </button>
                 ) : (
                     <button
                         type="button"
                         onClick={onEndVoiceCall}
-                        className="px-2.5 sm:px-3.5 py-2 rounded-xl bg-linear-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-semibold text-xs shadow-lg shadow-rose-600/30 flex items-center gap-1.5 transition-all cursor-pointer animate-pulse shrink-0"
+                        className="px-3 sm:px-4 py-2 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-semibold text-xs shadow-lg shadow-rose-600/30 flex items-center gap-1.5 sm:gap-2 transition-all cursor-pointer animate-pulse shrink-0"
                     >
-                        <PhoneOff className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                        <PhoneOff className="w-4 h-4 shrink-0" />
                         <span>End Call</span>
                     </button>
                 )}
