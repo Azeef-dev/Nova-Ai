@@ -128,7 +128,7 @@ export default function Sidebar({
 
                             {!user ? (
                                 <div className="p-3 rounded-xl bg-slate-800/40 border border-slate-700/60 text-xs text-slate-400 space-y-2">
-                                    <p>Sign in to save & sync your conversations in MongoDB.</p>
+                                    <p>Sign in to save & sync your conversations.</p>
                                     <button
                                         onClick={onOpenAuth}
                                         className="w-full py-1.5 px-3 rounded-lg bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 font-medium text-xs transition cursor-pointer flex items-center justify-center gap-1.5"
