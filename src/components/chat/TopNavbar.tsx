@@ -92,10 +92,10 @@ export default function TopNavbar({
     return (
         <header
             ref={dropdownContainerRef}
-            className="h-16 px-4 lg:px-6 bg-slate-950/75 backdrop-blur-xl border-b border-indigo-500/20 flex items-center justify-between gap-3 shrink-0 z-30"
+            className="min-h-16 px-4 lg:px-6 py-2.5 bg-slate-950/75 backdrop-blur-xl border-b border-indigo-500/20 flex items-center justify-between gap-3 shrink-0 z-30 flex-wrap gap-y-2"
         >
             {/* Left Controls & Dropdowns */}
-            <div className="flex items-center gap-2.5 flex-wrap">
+            <div className="flex items-center gap-2.5 flex-wrap gap-y-2">
                 {!isSidebarOpen && (
                     <button
                         type="button"
@@ -116,14 +116,14 @@ export default function TopNavbar({
                         }
                         className="px-3.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-indigo-500/25 text-xs font-medium text-slate-200 flex items-center gap-2 transition-all cursor-pointer"
                     >
-                        <Cpu className="w-4 h-4 text-indigo-400" />
-                        <span className="truncate max-w-35 sm:max-w-45">
+                        <Cpu className="w-4 h-4 text-indigo-400 shrink-0" />
+                        <span className="truncate max-w-28 sm:max-w-40">
                             {currentModel.name}
                         </span>
-                        <span className="hidden sm:inline-block text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                        <span className="hidden sm:inline-block text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shrink-0">
                             {currentModel.badge}
                         </span>
-                        <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                        <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                     </button>
 
                     {openDropdown === "model" && (
@@ -137,6 +137,11 @@ export default function TopNavbar({
                                 </span>
                             </div>
                             <div className="mt-1 space-y-1">
+                                {availableModels.length === 0 && (
+                                    <div className="px-3 py-3 text-[11px] text-slate-500">
+                                        No active chat models found on this Groq key.
+                                    </div>
+                                )}
                                 {availableModels.map((model) => {
                                     const active = selectedModel === model.id;
                                     return (
@@ -276,7 +281,9 @@ export default function TopNavbar({
                                         >
                                             <div>
                                                 <p className="text-xs font-semibold">{lang.name}</p>
-                                                <p className="text-[10px] text-slate-400">{lang.badge}</p>
+                                                <p className="text-[10px] text-slate-400">
+                                                    {lang.badge}
+                                                </p>
                                             </div>
                                             {active && <Check className="w-4 h-4 text-indigo-400" />}
                                         </button>
@@ -289,7 +296,7 @@ export default function TopNavbar({
             </div>
 
             {/* Right Action Bar */}
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2.5 flex-wrap justify-end">
                 {!user ? (
                     <Link
                         href="/login"
