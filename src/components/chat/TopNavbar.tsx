@@ -92,7 +92,7 @@ export default function TopNavbar({
     return (
         <header
             ref={dropdownContainerRef}
-            className="min-h-16 px-4 lg:px-6 py-2.5 bg-slate-950/75 backdrop-blur-xl border-b border-indigo-500/20 flex items-center justify-between gap-3 shrink-0 z-30 flex-wrap gap-y-2"
+            className="min-h-16 px-4 lg:px-6 py-2.5 bg-slate-950/75 backdrop-blur-xl border-b border-indigo-500/20 flex items-center gap-3 shrink-0 z-30 flex-wrap gap-y-2"
         >
             {/* Left Controls & Dropdowns */}
             <div className="flex items-center gap-2.5 flex-wrap gap-y-2">
@@ -295,8 +295,24 @@ export default function TopNavbar({
                 </div>
             </div>
 
-            {/* Right Action Bar */}
-            <div className="flex items-center gap-2.5 flex-wrap justify-end">
+            {/* Center Live Status Pill — fills the empty middle space elegantly on wide screens */}
+            <div className="hidden xl:flex flex-1 items-center justify-center min-w-0 px-4">
+                <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/60 border border-indigo-500/20 text-[11px] font-medium text-slate-300 shadow-inner shadow-black/20">
+                    <span className="relative flex h-2 w-2 shrink-0">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                    </span>
+                    <span className="text-emerald-300 font-semibold">Nova is live</span>
+                    <span className="text-slate-600">•</span>
+                    <span className="flex items-center gap-1 text-indigo-300">
+                        <currentPersona.icon className="w-3 h-3" />
+                        {currentPersona.name}
+                    </span>
+                </div>
+            </div>
+
+            {/* Right Action Bar — ml-auto keeps it flush right even when the header wraps */}
+            <div className="flex items-center gap-2.5 flex-wrap justify-end ml-auto">
                 {!user ? (
                     <Link
                         href="/login"
