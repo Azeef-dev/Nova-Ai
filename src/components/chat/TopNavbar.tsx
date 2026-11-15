@@ -27,7 +27,6 @@ import {
     UserProfile,
 } from "@/types/chat";
 import { LANGUAGES, PERSONAS, SPEECH_RATES } from "@/constants/chatData";
-import { renderPersonaIcon } from "./Sidebar";
 
 interface TopNavbarProps {
     isSidebarOpen: boolean;
@@ -149,8 +148,8 @@ export default function TopNavbar({
                                                 setOpenDropdown(null);
                                             }}
                                             className={`w-full p-2.5 rounded-xl text-left flex items-start justify-between gap-2 transition-all cursor-pointer ${active
-                                                    ? "bg-indigo-600/25 border border-indigo-500/40 text-white"
-                                                    : "hover:bg-slate-800/80 text-slate-300"
+                                                ? "bg-indigo-600/25 border border-indigo-500/40 text-white"
+                                                : "hover:bg-slate-800/80 text-slate-300"
                                                 }`}
                                         >
                                             <div className="min-w-0">
@@ -212,8 +211,8 @@ export default function TopNavbar({
                                                 setOpenDropdown(null);
                                             }}
                                             className={`w-full p-2.5 rounded-xl text-left flex items-center justify-between gap-2 transition-all cursor-pointer ${active
-                                                    ? "bg-indigo-600/25 border border-indigo-500/40 text-white"
-                                                    : "hover:bg-slate-800/80 text-slate-300"
+                                                ? "bg-indigo-600/25 border border-indigo-500/40 text-white"
+                                                : "hover:bg-slate-800/80 text-slate-300"
                                                 }`}
                                         >
                                             <div className="flex items-center gap-2.5">
@@ -271,8 +270,8 @@ export default function TopNavbar({
                                                 setOpenDropdown(null);
                                             }}
                                             className={`w-full p-2.5 rounded-xl text-left flex items-center justify-between transition-all cursor-pointer ${active
-                                                    ? "bg-indigo-600/25 border border-indigo-500/40 text-white"
-                                                    : "hover:bg-slate-800/80 text-slate-300"
+                                                ? "bg-indigo-600/25 border border-indigo-500/40 text-white"
+                                                : "hover:bg-slate-800/80 text-slate-300"
                                                 }`}
                                         >
                                             <div>
@@ -318,8 +317,8 @@ export default function TopNavbar({
                     }}
                     title={isMuted ? "Unmute Voice Output" : "Mute Voice Output"}
                     className={`p-2.5 rounded-xl border transition-all cursor-pointer ${isMuted
-                            ? "bg-rose-500/15 border-rose-500/40 text-rose-300 hover:bg-rose-500/25"
-                            : "bg-slate-900/90 border-indigo-500/25 text-emerald-400 hover:bg-slate-800"
+                        ? "bg-rose-500/15 border-rose-500/40 text-rose-300 hover:bg-rose-500/25"
+                        : "bg-slate-900/90 border-indigo-500/25 text-emerald-400 hover:bg-slate-800"
                         }`}
                 >
                     {isMuted ? (
@@ -363,8 +362,8 @@ export default function TopNavbar({
                                             type="button"
                                             onClick={() => setSpeechRate(rate.value)}
                                             className={`px-2.5 py-1.5 rounded-lg text-[11px] font-medium border transition-all cursor-pointer ${speechRate === rate.value
-                                                    ? "bg-indigo-600/30 border-indigo-500 text-white"
-                                                    : "bg-slate-800/70 border-slate-700/70 text-slate-400 hover:text-white"
+                                                ? "bg-indigo-600/30 border-indigo-500 text-white"
+                                                : "bg-slate-800/70 border-slate-700/70 text-slate-400 hover:text-white"
                                                 }`}
                                         >
                                             {rate.label}
@@ -382,8 +381,8 @@ export default function TopNavbar({
                                     <span>Auto-Read Chat Replies</span>
                                     <span
                                         className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${autoSpeakReplies
-                                                ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
-                                                : "bg-slate-800 text-slate-400"
+                                            ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                                            : "bg-slate-800 text-slate-400"
                                             }`}
                                     >
                                         {autoSpeakReplies ? "ON" : "OFF"}
