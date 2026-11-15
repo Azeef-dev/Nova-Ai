@@ -239,7 +239,7 @@ export default function Sidebar({
                                                     : "bg-slate-800 text-slate-400"
                                                     }`}
                                             >
-                                                {renderPersonaIcon(persona.iconType)}
+                                                {persona.iconType(persona.id)}
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center justify-between">
