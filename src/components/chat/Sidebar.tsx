@@ -72,7 +72,7 @@ export default function Sidebar({
                     {/* Top Brand */}
                     <div className="p-4 sm:p-5 border-b border-indigo-500/20 flex items-center justify-between shrink-0">
                         <div className="flex items-center gap-3 min-w-0">
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-violet-600 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/30 border border-indigo-400/30 shrink-0">
+                            <div className="w-10 h-10 rounded-xl bg-linear-to-tr from-indigo-600 via-violet-600 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/30 border border-indigo-400/30 shrink-0">
                                 <Sparkles className="w-5 h-5 text-white" />
                             </div>
                             <div className="min-w-0">
@@ -105,7 +105,7 @@ export default function Sidebar({
                         <button
                             type="button"
                             onClick={onNewConversation}
-                            className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-medium text-sm shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2.5 transition-all cursor-pointer active:scale-[0.99]"
+                            className="w-full py-3 px-4 rounded-xl bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-medium text-sm shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2.5 transition-all cursor-pointer active:scale-[0.99]"
                         >
                             <MessageSquarePlus className="w-4 h-4 shrink-0" />
                             <span className="truncate">Start New Conversation</span>
