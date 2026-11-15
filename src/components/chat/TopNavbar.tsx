@@ -186,7 +186,7 @@ export default function TopNavbar({
                         className="px-3.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-indigo-500/25 text-xs font-medium text-slate-200 flex items-center gap-2 transition-all cursor-pointer"
                     >
                         <span className="text-indigo-400">
-                            {renderPersonaIcon(currentPersona.iconType as unknown as string)}
+                            <currentPersona.icon className="w-4 h-4" />
                         </span>
                         <span className="hidden md:inline">{currentPersona.name}</span>
                         <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
