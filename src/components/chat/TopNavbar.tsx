@@ -92,10 +92,12 @@ export default function TopNavbar({
     return (
         <header
             ref={dropdownContainerRef}
-            className="min-h-16 px-4 lg:px-6 py-2.5 bg-slate-950/75 backdrop-blur-xl border-b border-indigo-500/20 flex items-center gap-3 shrink-0 z-30 flex-wrap gap-y-2"
+            className="min-h-16 px-4 lg:px-6 py-2.5 bg-slate-950/75 backdrop-blur-xl border-b border-indigo-500/20 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 shrink-0 z-30"
         >
-            {/* Left Controls & Dropdowns */}
-            <div className="flex items-center gap-2.5 flex-wrap gap-y-2 shrink-0">
+            {/* LEFT GROUP — sidebar toggle + the 3 selector dropdowns.
+                This is one atomic flex item in the outer row, so it never
+                gets split apart from the right group in an unpredictable way. */}
+            <div className="flex items-center gap-2.5 flex-wrap gap-y-2">
                 {!isSidebarOpen && (
                     <button
                         type="button"
@@ -295,32 +297,21 @@ export default function TopNavbar({
                 </div>
             </div>
 
-            {/* Center Live Status Pill — never wraps internally; if there's no
-                room on the current row it wraps to the next row as a whole
-                unit instead of squashing its text (fixes the cramped look
-                that happened when the sidebar is closed and the extra
-                "open sidebar" button eats up left-side space). */}
-            <div className="hidden xl:flex items-center justify-center shrink-0 mx-auto">
-                <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/60 border border-indigo-500/20 text-[11px] font-medium text-slate-300 shadow-inner shadow-black/20 whitespace-nowrap">
+            {/* RIGHT GROUP — one atomic flex item. The "Nova is live" pill lives
+                inside this same group (not as a separate wrapping unit), so it
+                always travels together with Sign In / Mute / Options / Call —
+                either the whole group sits on the same row as the left group,
+                or the whole group wraps to its own clean row below. No more
+                split-in-the-middle layouts. */}
+            <div className="flex items-center gap-2.5 flex-wrap gap-y-2 justify-end">
+                <div className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900/60 border border-emerald-500/20 text-[11px] font-semibold text-emerald-300 whitespace-nowrap shrink-0">
                     <span className="relative flex h-2 w-2 shrink-0">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                         <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
                     </span>
-                    <span className="text-emerald-300 font-semibold shrink-0">
-                        Nova is live
-                    </span>
-                    <span className="hidden 2xl:flex items-center gap-1.5 shrink-0">
-                        <span className="text-slate-600">•</span>
-                        <span className="flex items-center gap-1 text-indigo-300 shrink-0">
-                            <currentPersona.icon className="w-3 h-3 shrink-0" />
-                            {currentPersona.name}
-                        </span>
-                    </span>
+                    Nova is live
                 </div>
-            </div>
 
-            {/* Right Action Bar — ml-auto keeps it flush right even when the header wraps */}
-            <div className="flex items-center gap-2.5 flex-wrap justify-end ml-auto shrink-0">
                 {!user ? (
                     <Link
                         href="/login"
