@@ -217,14 +217,14 @@ export default function TopNavbar({
                                         >
                                             <div className="flex items-center gap-2.5">
                                                 <span className="text-indigo-400">
-                                                    {renderPersonaIcon(persona.iconType as unknown as string)}
+                                                    <persona.icon className="w-4 h-4" />
                                                 </span>
                                                 <div>
                                                     <p className="text-xs font-semibold">
                                                         {persona.name}
                                                     </p>
                                                     <p className="text-[10px] text-slate-400">
-                                                        {persona.role}
+                                                        {persona.description}
                                                     </p>
                                                 </div>
                                             </div>
