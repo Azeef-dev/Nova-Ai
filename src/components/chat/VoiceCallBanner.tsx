@@ -24,7 +24,7 @@ export default function VoiceCallBanner({
     if (!isCallActive) return null;
 
     return (
-        <div className="px-3 sm:px-6 lg:px-8 py-3 bg-gradient-to-r from-indigo-950/95 via-purple-950/90 to-indigo-950/95 border-b border-indigo-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shrink-0 z-20 shadow-lg">
+        <div className="px-3 sm:px-6 lg:px-8 py-3 bg-linear-to-r from-indigo-950/95 via-purple-950/90 to-indigo-950/95 border-b border-indigo-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shrink-0 z-20 shadow-lg">
             <div className="flex items-center gap-3 min-w-0 flex-1">
                 <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-400/40 shrink-0">
                     {status === "listening" ? (
