@@ -31,6 +31,49 @@ const LANGUAGE_INSTRUCTIONS: Record<string, string> = {
     "ar-SA": "Respond in clear, natural Arabic.",
 };
 
+// Only these model-family name fragments are real TEXT chat-completion
+// models on Groq. Anything that does NOT match one of these (TTS, STT,
+// vision-only, guard/moderation, embeddings, agentic "compound" systems,
+// etc.) is excluded automatically — this is far more reliable than trying
+// to blocklist every non-chat model name Groq might add in the future.
+const ALLOWED_FAMILY_PATTERNS = [
+    "llama",
+    "gemma",
+    "mixtral",
+    "qwen",
+    "deepseek",
+    "kimi",
+    "gpt-oss",
+];
+
+// Extra safety net: explicitly exclude known non-chat / restricted ids
+// even if one of them happens to match a family pattern above (e.g. llama-guard).
+const BLOCKED_KEYWORDS = [
+    "whisper",
+    "guard",
+    "tts",
+    "vision",
+    "playai",
+    "allam",
+    "embedding",
+    "compound",
+    "safeguard",
+    "orpheus",
+    "canopylabs",
+    "moderation",
+    "stt",
+    "audio",
+];
+
+function isSafeChatModel(id: string): boolean {
+    const lower = id.toLowerCase();
+    const isKnownChatFamily = ALLOWED_FAMILY_PATTERNS.some((kw) =>
+        lower.includes(kw)
+    );
+    const isBlocked = BLOCKED_KEYWORDS.some((kw) => lower.includes(kw));
+    return isKnownChatFamily && !isBlocked;
+}
+
 export async function GET() {
     try {
         const apiKey = process.env.GROQ_API_KEY;
@@ -51,24 +94,8 @@ export async function GET() {
         const rawModels: Array<{ id: string; owned_by?: string }> =
             data?.data || [];
 
-        // Filter out non-conversational or restricted models like allam-2-7b, whisper, guard, tts
-        const blockedKeywords = [
-            "whisper",
-            "guard",
-            "tts",
-            "vision",
-            "playai",
-            "allam",
-            "embedding",
-            "compound",
-            " safeguard",
-        ];
-
         const chatModels = rawModels
-            .filter((m) => {
-                const id = m.id.toLowerCase();
-                return !blockedKeywords.some((kw) => id.includes(kw));
-            })
+            .filter((m) => isSafeChatModel(m.id))
             .map((m) => ({
                 id: m.id,
                 name: m.id,
@@ -144,10 +171,11 @@ export async function POST(req: Request) {
 
         const systemPrompt = `${personaInstruction}\n${languageInstruction}\n${voiceInstruction}`;
 
-        // Never use allam-2-7b as primary model
-        const safeRequestedModel = model.toLowerCase().includes("allam")
-            ? "llama-3.1-8b-instant"
-            : model;
+        // Never send a non text-chat model (TTS/whisper/guard/etc.) to the
+        // chat completions endpoint — fall back to a safe default instead.
+        const safeRequestedModel = isSafeChatModel(String(model || ""))
+            ? model
+            : "llama-3.1-8b-instant";
 
         const candidateModels = [
             safeRequestedModel,
