@@ -37,6 +37,7 @@ export type ModelOption = {
 };
 
 export type PersonaOption = {
+    role: ReactNode;
     iconType(iconType: any): React.ReactNode;
     id: string;
     name: string;
@@ -45,6 +46,9 @@ export type PersonaOption = {
 };
 
 export type LanguageOption = {
+    code: Key | null | undefined;
+    code(code: any): unknown;
+    label: ReactNode;
     id: string;
     name: string;
     voiceLang: string;
