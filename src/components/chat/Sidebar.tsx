@@ -40,7 +40,7 @@ interface SidebarProps {
     onLogout: () => void;
 }
 
-export function renderPersonaIcon(iconType: PersonaOption["iconType"]) {
+export function renderPersonaIcon(iconType: string) {
     switch (iconType) {
         case "briefcase":
             return <Briefcase className="w-4 h-4" />;
@@ -52,6 +52,8 @@ export function renderPersonaIcon(iconType: PersonaOption["iconType"]) {
             return <GraduationCap className="w-4 h-4" />;
         case "headphones":
             return <Headphones className="w-4 h-4" />;
+        default:
+            return <Sparkles className="w-4 h-4" />;
     }
 }
 
@@ -82,8 +84,8 @@ export default function Sidebar({
             <div
                 onClick={() => setIsSidebarOpen(false)}
                 className={`fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-30 md:hidden transition-opacity duration-300 ${isSidebarOpen
-                        ? "opacity-100 pointer-events-auto cursor-pointer"
-                        : "opacity-0 pointer-events-none"
+                    ? "opacity-100 pointer-events-auto cursor-pointer"
+                    : "opacity-0 pointer-events-none"
                     }`}
             />
 
@@ -181,8 +183,8 @@ export default function Sidebar({
                                                 key={item._id}
                                                 onClick={() => onSelectSession(item._id)}
                                                 className={`group flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl border text-left transition-all cursor-pointer ${isActive
-                                                        ? "bg-indigo-600/20 border-indigo-500/40 text-white"
-                                                        : "bg-slate-900/40 border-transparent hover:bg-slate-900/80 hover:border-slate-800 text-slate-300"
+                                                    ? "bg-indigo-600/20 border-indigo-500/40 text-white"
+                                                    : "bg-slate-900/40 border-transparent hover:bg-slate-900/80 hover:border-slate-800 text-slate-300"
                                                     }`}
                                             >
                                                 <div className="flex items-center gap-2.5 min-w-0">
@@ -233,8 +235,8 @@ export default function Sidebar({
                                         >
                                             <div
                                                 className={`p-2 rounded-lg mt-0.5 ${active
-                                                        ? "bg-indigo-500 text-white"
-                                                        : "bg-slate-800 text-slate-400"
+                                                    ? "bg-indigo-500 text-white"
+                                                    : "bg-slate-800 text-slate-400"
                                                     }`}
                                             >
                                                 {renderPersonaIcon(persona.iconType)}
@@ -248,9 +250,6 @@ export default function Sidebar({
                                                         <Check className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
                                                     )}
                                                 </div>
-                                                <p className="text-[11px] text-slate-400 truncate mt-0.5">
-                                                    {persona.role}
-                                                </p>
                                             </div>
                                         </button>
                                     );

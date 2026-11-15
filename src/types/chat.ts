@@ -37,6 +37,7 @@ export type ModelOption = {
 };
 
 export type PersonaOption = {
+    iconType(iconType: any): React.ReactNode;
     id: string;
     name: string;
     description: string;
