@@ -1,162 +1,153 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import toast from "react-hot-toast";
 import {
-    DEFAULT_FREE_MODELS,
-    PERSONAS,
-    LANGUAGES,
-} from "@/constants/chatData";
-import {
-    ChatSessionItem,
     ChatStatus,
     DropdownType,
-    LanguageOption,
     Message,
     ModelOption,
-    PersonaOption,
+    ChatSessionItem,
     UserProfile,
 } from "@/types/chat";
-import Sidebar from "@/components/chat/Sidebar";
-import TopNavbar from "@/components/chat/TopNavbar";
-import VoiceCallBanner from "@/components/chat/VoiceCallBanner";
-import MessageList from "@/components/chat/MessageList";
-import ChatComposer from "@/components/chat/ChatComposer";
-import AuthModal from "@/components/chat/AuthModal";
+import { DEFAULT_FREE_MODELS, LANGUAGES, PERSONAS } from "@/constants/chatData";
+import Sidebar from "./chat/Sidebar";
+import TopNavbar from "./chat/TopNavbar";
+import VoiceCallBanner from "./chat/VoiceCallBanner";
+import MessageList from "./chat/MessageList";
+import ChatComposer from "./chat/ChatComposer";
 
 export default function VoiceChatApp() {
-    const [models, setModels] = useState<ModelOption[]>(DEFAULT_FREE_MODELS);
-    const [messages, setMessages] = useState<Message[]>([]);
-    const [inputText, setInputText] = useState("");
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-    const [isCallActive, setIsCallActive] = useState(false);
-    const [isDictating, setIsDictating] = useState(false);
-    const [isMuted, setIsMuted] = useState(false);
-    const [autoSpeakChat, setAutoSpeakChat] = useState(false);
-    const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
-    const [copiedId, setCopiedId] = useState<string | null>(null);
-    const [status, setStatus] = useState<ChatStatus>("idle");
+    // UI & Layout State
+    const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
+    const [openDropdown, setOpenDropdown] = useState<DropdownType>(null);
 
-    // Auth & MongoDB Session States
+    // Auth & MongoDB Session State
     const [user, setUser] = useState<UserProfile | null>(null);
-    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [sessions, setSessions] = useState<ChatSessionItem[]>([]);
     const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
 
-    const [selectedModel, setSelectedModel] = useState<ModelOption>(
-        DEFAULT_FREE_MODELS[0]
+    // Assistant Configuration State (Always default to llama-3.1-8b-instant)
+    const [availableModels, setAvailableModels] =
+        useState<ModelOption[]>(DEFAULT_FREE_MODELS);
+    const [selectedModel, setSelectedModel] = useState<string>(
+        "llama-3.1-8b-instant"
     );
-    const [selectedPersona, setSelectedPersona] = useState<PersonaOption>(
-        PERSONAS[0]
+    const [selectedPersona, setSelectedPersona] = useState<string>(
+        PERSONAS[0].id
     );
-    const [selectedLanguage, setSelectedLanguage] = useState<LanguageOption>(
-        LANGUAGES[0]
+    const [selectedLanguage, setSelectedLanguage] = useState<string>(
+        LANGUAGES[0].code
     );
     const [speechRate, setSpeechRate] = useState<number>(1.0);
-    const [openDropdown, setOpenDropdown] = useState<DropdownType>(null);
+    const [autoSpeakReplies, setAutoSpeakReplies] = useState<boolean>(true);
+    const [isMuted, setIsMuted] = useState<boolean>(false);
 
-    const isCallActiveRef = useRef(false);
-    const isMutedRef = useRef(false);
-    const messagesRef = useRef<Message[]>([]);
-    const activeSessionIdRef = useRef<string | null>(null);
+    // Conversation & Voice Call State
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [inputText, setInputText] = useState<string>("");
+    const [liveTranscript, setLiveTranscript] = useState<string>("");
+    const [isCallActive, setIsCallActive] = useState<boolean>(false);
+    const [status, setStatus] = useState<ChatStatus>("idle");
+    const [copiedId, setCopiedId] = useState<string | null>(null);
+    const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(
+        null
+    );
+
+    // Refs for async callbacks & Web Speech API
+    const isCallActiveRef = useRef<boolean>(false);
+    const statusRef = useRef<ChatStatus>("idle");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const recognitionRef = useRef<any>(null);
-    const chatEndRef = useRef<HTMLDivElement | null>(null);
-    const headerRef = useRef<HTMLElement | null>(null);
+    const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const latestTranscriptRef = useRef<string>("");
+    const messagesEndRef = useRef<HTMLDivElement | null>(null);
+    const dropdownContainerRef = useRef<HTMLDivElement | null>(null);
+    const sendMessageRef = useRef<(text: string) => void>(() => { });
 
-    const selectedModelRef = useRef(selectedModel);
-    const selectedPersonaRef = useRef(selectedPersona);
-    const selectedLanguageRef = useRef(selectedLanguage);
-    const speechRateRef = useRef(speechRate);
+    const updateStatus = useCallback((next: ChatStatus) => {
+        statusRef.current = next;
+        setStatus(next);
+    }, []);
 
-    useEffect(() => {
-        selectedModelRef.current = selectedModel;
-    }, [selectedModel]);
+    const currentModel =
+        availableModels.find((m) => m.id === selectedModel) || availableModels[0];
+    const currentPersona =
+        PERSONAS.find((p) => p.id === selectedPersona) || PERSONAS[0];
+    const currentLanguage =
+        LANGUAGES.find((l) => l.code === selectedLanguage) || LANGUAGES[0];
 
-    useEffect(() => {
-        selectedPersonaRef.current = selectedPersona;
-    }, [selectedPersona]);
+    const formatTime = () =>
+        new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
-    useEffect(() => {
-        selectedLanguageRef.current = selectedLanguage;
-    }, [selectedLanguage]);
-
-    useEffect(() => {
-        speechRateRef.current = speechRate;
-    }, [speechRate]);
-
-    useEffect(() => {
-        activeSessionIdRef.current = activeSessionId;
-    }, [activeSessionId]);
-
-    const fetchUserSessions = async () => {
+    // Fetch User Sessions from MongoDB
+    const fetchSessions = useCallback(async () => {
         try {
             const res = await fetch("/api/sessions");
-            if (!res.ok) return;
             const data = await res.json();
             if (Array.isArray(data.sessions)) {
                 setSessions(data.sessions);
             }
-        } catch { }
-    };
+        } catch {
+            // Ignore if offline
+        }
+    }, []);
 
-    // Check current logged-in user & load MongoDB sessions
+    // Check Current Logged-in User on Mount
     useEffect(() => {
-        async function initAuthAndModels() {
+        async function checkUser() {
             try {
-                const authRes = await fetch("/api/auth");
-                if (authRes.ok) {
-                    const authData = await authRes.json();
-                    if (authData.user) {
-                        setUser(authData.user);
-                        fetchUserSessions();
-                    }
+                const res = await fetch("/api/auth");
+                const data = await res.json();
+                if (data?.user) {
+                    setUser(data.user);
+                    fetchSessions();
                 }
-            } catch { }
+            } catch {
+                // Guest mode
+            }
+        }
+        checkUser();
+    }, [fetchSessions]);
 
+    // Fetch Active Free Models from Groq API without overriding llama-3.1-8b-instant with allam-2-7b
+    useEffect(() => {
+        async function loadActiveModels() {
             try {
                 const res = await fetch("/api/chat");
-                if (!res.ok) return;
                 const data = await res.json();
-                if (Array.isArray(data.models) && data.models.length > 0) {
-                    const availableIds = new Set<string>(data.models);
-                    const filteredDefaults = DEFAULT_FREE_MODELS.filter((m) =>
-                        availableIds.has(m.id)
+                if (
+                    data?.models &&
+                    Array.isArray(data.models) &&
+                    data.models.length > 0
+                ) {
+                    setAvailableModels(data.models);
+                    const hasDefault = data.models.some(
+                        (m: ModelOption) => m.id === "llama-3.1-8b-instant"
                     );
-                    const extraModels: ModelOption[] = data.models
-                        .filter(
-                            (id: string) => !DEFAULT_FREE_MODELS.some((d) => d.id === id)
-                        )
-                        .slice(0, 6)
-                        .map((id: string) => ({
-                            id,
-                            name: id,
-                            badge: "FREE • Active",
-                            description: "Verified active model on your Groq API key",
-                        }));
-
-                    const merged = [...filteredDefaults, ...extraModels];
-                    if (merged.length > 0) {
-                        setModels(merged);
-                        setSelectedModel(merged[0]);
-                    }
+                    setSelectedModel(
+                        hasDefault ? "llama-3.1-8b-instant" : data.models[0].id
+                    );
                 }
-            } catch { }
+            } catch {
+                // Keep default fallback list
+            }
         }
-        initAuthAndModels();
+        loadActiveModels();
     }, []);
 
+    // Auto-scroll to newest message
     useEffect(() => {
-        if (typeof window !== "undefined" && "speechSynthesis" in window) {
-            window.speechSynthesis.getVoices();
-        }
-    }, []);
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages, status, liveTranscript]);
 
+    // Close dropdowns on outside click
     useEffect(() => {
-        chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messages, status]);
-
-    useEffect(() => {
-        const handleClickOutside = (e: MouseEvent) => {
-            if (headerRef.current && !headerRef.current.contains(e.target as Node)) {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (
+                dropdownContainerRef.current &&
+                !dropdownContainerRef.current.contains(event.target as Node)
+            ) {
                 setOpenDropdown(null);
             }
         };
@@ -164,583 +155,718 @@ export default function VoiceChatApp() {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    const persistMessagesToDB = async (updatedMessages: Message[]) => {
-        try {
-            const res = await fetch("/api/sessions", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    sessionId: activeSessionIdRef.current,
-                    messages: updatedMessages,
-                    persona: selectedPersonaRef.current.id,
-                    model: selectedModelRef.current.id,
-                    language: selectedLanguageRef.current.id,
-                }),
-            });
-            if (res.ok) {
-                const data = await res.json();
-                if (data.session && data.session._id) {
-                    setActiveSessionId(data.session._id);
-                    activeSessionIdRef.current = data.session._id;
-                    fetchUserSessions();
-                }
-            }
-        } catch { }
-    };
-
-    const getCurrentTime = () => {
-        return new Date().toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-        });
-    };
-
-    const getBestVoice = (targetLang: string) => {
-        if (typeof window === "undefined" || !("speechSynthesis" in window))
-            return null;
-        const voices = window.speechSynthesis.getVoices();
-        const langPrefix = targetLang.split("-")[0];
-
-        return (
-            voices.find(
-                (v) =>
-                    v.lang.toLowerCase().includes(targetLang.toLowerCase()) &&
-                    (v.name.includes("Natural") ||
-                        v.name.includes("Google") ||
-                        v.name.includes("Premium"))
-            ) ||
-            voices.find((v) =>
-                v.lang.toLowerCase().includes(targetLang.toLowerCase())
-            ) ||
-            voices.find((v) => v.lang.toLowerCase().startsWith(langPrefix)) ||
-            voices[0]
-        );
-    };
-
-    const speakText = (text: string, msgId?: string) => {
-        if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-
-        if (isMutedRef.current) {
-            if (isCallActiveRef.current) startListening();
-            else setStatus("idle");
-            return;
-        }
-
-        window.speechSynthesis.cancel();
-        setStatus("speaking");
-        if (msgId) setSpeakingMessageId(msgId);
-
-        const cleanText = text.replace(/[*#`_~]/g, "");
-        const utterance = new SpeechSynthesisUtterance(cleanText);
-        const voiceLang = selectedLanguageRef.current.voiceLang;
-        const bestVoice = getBestVoice(voiceLang);
-
-        if (bestVoice) utterance.voice = bestVoice;
-        utterance.lang = voiceLang;
-        utterance.rate = speechRateRef.current;
-
-        utterance.onend = () => {
-            setSpeakingMessageId(null);
-            if (isCallActiveRef.current) {
-                startListening();
-            } else {
-                setStatus("idle");
-            }
-        };
-
-        utterance.onerror = () => {
-            setSpeakingMessageId(null);
-            if (isCallActiveRef.current) {
-                startListening();
-            } else {
-                setStatus("idle");
-            }
-        };
-
-        window.speechSynthesis.speak(utterance);
-    };
-
-    const stopSpeaking = () => {
+    // Stop Speech Synthesis
+    const stopSpeaking = useCallback(() => {
         if (typeof window !== "undefined" && "speechSynthesis" in window) {
             window.speechSynthesis.cancel();
         }
         setSpeakingMessageId(null);
-        if (isCallActiveRef.current) {
-            startListening();
-        } else {
-            setStatus("idle");
+        if (statusRef.current === "speaking") {
+            updateStatus("idle");
         }
-    };
+    }, [updateStatus]);
 
-    // Bulletproof Speech Recognition (Fixes undefined reading '0' error)
-    const startListening = () => {
-        if (!isCallActiveRef.current || typeof window === "undefined") return;
+    // Speak Text with Safety Watchdog Timer (so Chrome TTS never hangs)
+    const speakText = useCallback(
+        (text: string, onComplete?: () => void, messageId?: string) => {
+            if (
+                isMuted ||
+                typeof window === "undefined" ||
+                !("speechSynthesis" in window)
+            ) {
+                if (onComplete) onComplete();
+                return;
+            }
 
-        const SpeechRecognition =
-            (window as any).SpeechRecognition ||
-            (window as any).webkitSpeechRecognition;
+            window.speechSynthesis.cancel();
 
-        if (!SpeechRecognition) {
-            alert(
-                "Your browser does not support Web Speech Recognition. Please use Google Chrome or Edge."
+            const cleanText = text
+                .replace(/```[\s\S]*?```/g, "Code block provided in the chat window.")
+                .replace(/[*#_`~>-]/g, " ")
+                .replace(/\s+/g, " ")
+                .trim();
+
+            if (!cleanText) {
+                if (onComplete) onComplete();
+                return;
+            }
+
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            utterance.lang = selectedLanguage;
+            utterance.rate = speechRate;
+
+            // Try matching voice for selected language
+            const voices = window.speechSynthesis.getVoices();
+            const matchedVoice =
+                voices.find((v) => v.lang === selectedLanguage) ||
+                voices.find((v) =>
+                    v.lang.startsWith(selectedLanguage.split("-")[0])
+                );
+            if (matchedVoice) {
+                utterance.voice = matchedVoice;
+            }
+
+            let finished = false;
+            const finishSpeaking = () => {
+                if (finished) return;
+                finished = true;
+                setSpeakingMessageId(null);
+                updateStatus("idle");
+                if (onComplete) onComplete();
+            };
+
+            // Safety watchdog in case Chrome speechSynthesis onend doesn't trigger
+            const estimatedMs = Math.max(
+                4000,
+                Math.min(35000, cleanText.length * 90)
             );
-            setStatus("idle");
-            return;
+            const watchdog = setTimeout(finishSpeaking, estimatedMs);
+
+            utterance.onstart = () => {
+                updateStatus("speaking");
+                if (messageId) setSpeakingMessageId(messageId);
+            };
+
+            utterance.onend = () => {
+                clearTimeout(watchdog);
+                finishSpeaking();
+            };
+
+            utterance.onerror = () => {
+                clearTimeout(watchdog);
+                finishSpeaking();
+            };
+
+            window.speechSynthesis.speak(utterance);
+        },
+        [isMuted, selectedLanguage, speechRate, updateStatus]
+    );
+
+    // Stop Microphone Listening
+    const stopListening = useCallback(() => {
+        if (silenceTimerRef.current) {
+            clearTimeout(silenceTimerRef.current);
+            silenceTimerRef.current = null;
         }
-
-        try {
-            recognitionRef.current?.stop();
-        } catch { }
-
-        const recognition = new SpeechRecognition();
-        recognition.lang = selectedLanguageRef.current.id;
-        recognition.continuous = false;
-        recognition.interimResults = false;
-
-        recognition.onstart = () => setStatus("listening");
-
-        recognition.onresult = (event: any) => {
+        if (recognitionRef.current) {
             try {
-                const results = event?.results;
-                if (!results || typeof results.length !== "number" || results.length === 0) {
-                    if (isCallActiveRef.current) startListening();
-                    return;
-                }
-                const idx =
-                    typeof event.resultIndex === "number" && results[event.resultIndex]
-                        ? event.resultIndex
-                        : 0;
-                const firstResult = results[idx] || results[0];
-                const alternative = firstResult ? firstResult[0] : null;
-                const transcript = alternative?.transcript
-                    ? String(alternative.transcript).trim()
-                    : "";
-
-                if (transcript) {
-                    sendMessageToAI(transcript, true);
-                } else if (isCallActiveRef.current) {
-                    startListening();
-                }
+                recognitionRef.current.onend = null;
+                recognitionRef.current.abort();
             } catch {
-                if (isCallActiveRef.current) startListening();
+                // Ignore abort errors
             }
-        };
+            recognitionRef.current = null;
+        }
+        setLiveTranscript("");
+        latestTranscriptRef.current = "";
+        if (statusRef.current === "listening") {
+            updateStatus("idle");
+        }
+    }, [updateStatus]);
 
-        recognition.onerror = (event: any) => {
-            if (event?.error === "no-speech" && isCallActiveRef.current) {
-                try {
-                    recognition.stop();
-                } catch { }
-                setTimeout(() => {
-                    if (isCallActiveRef.current) startListening();
-                }, 250);
-            } else if (!isCallActiveRef.current) {
-                setStatus("idle");
-            }
-        };
-
-        recognitionRef.current = recognition;
-        try {
-            recognition.start();
-        } catch { }
-    };
-
-    const toggleDictation = () => {
+    // Start Microphone Listening (Fresh Instance + Real-Time Interim Captions + Auto-Send)
+    const startListening = useCallback(() => {
         if (typeof window === "undefined") return;
 
-        if (isDictating) {
-            try {
-                recognitionRef.current?.stop();
-            } catch { }
-            setIsDictating(false);
-            setStatus("idle");
-            return;
-        }
-
         const SpeechRecognition =
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (window as any).SpeechRecognition ||
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (window as any).webkitSpeechRecognition;
 
         if (!SpeechRecognition) {
-            alert(
-                "Your browser does not support Speech Recognition. Please use Google Chrome or Edge."
+            toast.error(
+                "Speech recognition is not supported in this browser. Please use Google Chrome or Microsoft Edge."
             );
             return;
         }
 
-        const recognition = new SpeechRecognition();
-        recognition.lang = selectedLanguageRef.current.id;
-        recognition.continuous = false;
-        recognition.interimResults = false;
+        stopSpeaking();
 
-        recognition.onstart = () => {
-            setIsDictating(true);
-            setStatus("listening");
+        // Cleanly close any previous recognition instance
+        if (recognitionRef.current) {
+            try {
+                recognitionRef.current.onend = null;
+                recognitionRef.current.abort();
+            } catch {
+                // Ignore
+            }
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = selectedLanguage;
+
+        latestTranscriptRef.current = "";
+        setLiveTranscript("");
+
+        const commitVoiceMessage = (spokenText: string) => {
+            const cleaned = spokenText.trim();
+            if (!cleaned) return;
+
+            if (silenceTimerRef.current) {
+                clearTimeout(silenceTimerRef.current);
+                silenceTimerRef.current = null;
+            }
+
+            latestTranscriptRef.current = "";
+            setLiveTranscript("");
+
+            try {
+                recognition.onend = null;
+                recognition.stop();
+            } catch {
+                // Ignore
+            }
+
+            sendMessageRef.current(cleaned);
         };
 
+        recognition.onstart = () => {
+            updateStatus("listening");
+        };
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         recognition.onresult = (event: any) => {
             try {
                 const results = event?.results;
-                if (results && results.length > 0) {
-                    const idx =
-                        typeof event.resultIndex === "number" && results[event.resultIndex]
-                            ? event.resultIndex
-                            : 0;
-                    const firstResult = results[idx] || results[0];
-                    const transcript = firstResult?.[0]?.transcript
-                        ? String(firstResult[0].transcript).trim()
-                        : "";
-                    if (transcript) {
-                        setInputText((prev) => (prev ? [prev, transcript].join(" ") : transcript));
+                if (!results || results.length === 0) return;
+
+                let finalTranscript = "";
+                let interimTranscript = "";
+
+                for (let i = 0; i < results.length; i++) {
+                    const item = results[i];
+                    const textPiece = item?.[0]?.transcript || "";
+                    if (item.isFinal) {
+                        finalTranscript += textPiece + " ";
+                    } else {
+                        interimTranscript += textPiece;
                     }
                 }
-            } catch { }
-            setIsDictating(false);
-            setStatus("idle");
+
+                const combined = (finalTranscript + interimTranscript).trim();
+                if (!combined) return;
+
+                latestTranscriptRef.current = combined;
+                setLiveTranscript(combined);
+                setInputText(combined);
+
+                // Wait 1.1 seconds of silence after speaking, then automatically send!
+                if (silenceTimerRef.current) {
+                    clearTimeout(silenceTimerRef.current);
+                }
+                silenceTimerRef.current = setTimeout(() => {
+                    if (latestTranscriptRef.current.trim()) {
+                        commitVoiceMessage(latestTranscriptRef.current);
+                    }
+                }, 1100);
+            } catch (err) {
+                console.warn("Speech recognition parse warning:", err);
+            }
         };
 
-        recognition.onerror = () => {
-            setIsDictating(false);
-            setStatus("idle");
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        recognition.onerror = (event: any) => {
+            const errCode = event?.error;
+            if (errCode === "not-allowed" || errCode === "service-not-allowed") {
+                toast.error(
+                    "Microphone access denied! Please allow microphone permission in your browser address bar."
+                );
+                setIsCallActive(false);
+                isCallActiveRef.current = false;
+                updateStatus("idle");
+                return;
+            }
+            // Ignore 'no-speech' or 'aborted' during active voice call
         };
 
         recognition.onend = () => {
-            setIsDictating(false);
-            if (!isCallActiveRef.current) setStatus("idle");
+            // If user spoke something before recognition ended, send it immediately
+            if (latestTranscriptRef.current.trim()) {
+                const pending = latestTranscriptRef.current.trim();
+                latestTranscriptRef.current = "";
+                setLiveTranscript("");
+                sendMessageRef.current(pending);
+                return;
+            }
+
+            // If hands-free voice call is still active and AI is not thinking/speaking, keep listening!
+            if (
+                isCallActiveRef.current &&
+                statusRef.current !== "thinking" &&
+                statusRef.current !== "speaking"
+            ) {
+                setTimeout(() => {
+                    if (
+                        isCallActiveRef.current &&
+                        statusRef.current !== "thinking" &&
+                        statusRef.current !== "speaking"
+                    ) {
+                        try {
+                            recognition.start();
+                        } catch {
+                            // Ignore
+                        }
+                    }
+                }, 250);
+            } else if (statusRef.current === "listening") {
+                updateStatus("idle");
+            }
         };
 
         recognitionRef.current = recognition;
+
         try {
             recognition.start();
-        } catch { }
-    };
+        } catch {
+            // Ignore start error
+        }
+    }, [selectedLanguage, stopSpeaking, updateStatus]);
 
-    const sendMessageToAI = async (text: string, isVoice: boolean) => {
-        if (!text.trim()) return;
+    // Force Send Live Transcript Immediately
+    const handleForceSendTranscript = useCallback(() => {
+        const textToSend = latestTranscriptRef.current.trim() || inputText.trim();
+        if (!textToSend) return;
+        stopListening();
+        sendMessageRef.current(textToSend);
+    }, [inputText, stopListening]);
 
-        const userMsg: Message = {
-            id: Date.now().toString(),
-            role: "user",
-            content: text,
-            time: getCurrentTime(),
-        };
+    // Persist Conversation in MongoDB (if logged in)
+    const persistSessionToDB = useCallback(
+        async (
+            updatedMessages: Message[],
+            sessionIdToUpdate: string | null,
+            usedModel: string
+        ) => {
+            if (!user || updatedMessages.length === 0) return;
+            try {
+                const res = await fetch("/api/sessions", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        sessionId: sessionIdToUpdate,
+                        persona: selectedPersona,
+                        model: usedModel,
+                        language: selectedLanguage,
+                        messages: updatedMessages,
+                    }),
+                });
+                const data = await res.json();
+                if (res.ok && data?.session?._id) {
+                    setActiveSessionId(data.session._id);
+                    fetchSessions();
+                }
+            } catch {
+                // Silent fail if DB not connected
+            }
+        },
+        [user, selectedPersona, selectedLanguage, fetchSessions]
+    );
 
-        const updatedMessages = [...messagesRef.current, userMsg];
-        messagesRef.current = updatedMessages;
-        setMessages(updatedMessages);
-        setStatus("thinking");
+    // Send User Message to Groq API
+    const sendMessage = useCallback(
+        async (rawText: string) => {
+            const trimmed = rawText.trim();
+            if (!trimmed) return;
 
-        const startTime = performance.now();
+            const userMessage: Message = {
+                id: Date.now().toString(),
+                role: "user",
+                content: trimmed,
+                time: formatTime(),
+            };
 
-        try {
-            const response = await fetch("/api/chat", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    messages: updatedMessages.map((m) => ({
-                        role: m.role,
-                        content: m.content,
-                    })),
-                    model: selectedModelRef.current.id,
-                    persona: selectedPersonaRef.current.id,
-                    language: selectedLanguageRef.current.id,
-                    isVoiceCall: isVoice || isCallActiveRef.current,
-                }),
-            });
+            const updatedMessages = [...messages, userMessage];
+            setMessages(updatedMessages);
+            setInputText("");
+            setLiveTranscript("");
+            latestTranscriptRef.current = "";
+            updateStatus("thinking");
 
-            const endTime = performance.now();
-            const latency = ((endTime - startTime) / 1000).toFixed(2) + "s";
+            const startTime = performance.now();
 
-            let replyText =
-                "I apologize, I could not process that request. Please try again.";
-            let actualModelUsed = selectedModelRef.current.name;
+            try {
+                const response = await fetch("/api/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        messages: updatedMessages.map((m) => ({
+                            role: m.role,
+                            content: m.content,
+                        })),
+                        model: selectedModel,
+                        persona: selectedPersona,
+                        language: selectedLanguage,
+                        isVoiceCall: isCallActiveRef.current,
+                    }),
+                });
 
-            if (response.ok) {
                 const data = await response.json();
-                replyText = data.reply || replyText;
-                if (data.usedModel) {
-                    actualModelUsed = data.usedModel;
+                const latencyMs = Math.round(performance.now() - startTime);
+
+                if (!response.ok) {
+                    throw new Error(data?.error || "Failed to get response from Groq.");
+                }
+
+                const aiReply: string =
+                    data.reply || "I could not process that request.";
+                const usedModel: string = data.usedModel || selectedModel;
+
+                if (usedModel !== selectedModel) {
+                    setSelectedModel(usedModel);
+                }
+
+                const assistantMessageId = (Date.now() + 1).toString();
+                const assistantMessage: Message = {
+                    id: assistantMessageId,
+                    role: "assistant",
+                    content: aiReply,
+                    time: formatTime(),
+                    model: usedModel,
+                    latencyMs,
+                };
+
+                const finalMessages = [...updatedMessages, assistantMessage];
+                setMessages(finalMessages);
+
+                // Auto-save to MongoDB if logged in
+                persistSessionToDB(finalMessages, activeSessionId, usedModel);
+
+                if (isCallActiveRef.current) {
+                    speakText(
+                        aiReply,
+                        () => {
+                            if (isCallActiveRef.current) {
+                                startListening();
+                            }
+                        },
+                        assistantMessageId
+                    );
+                } else if (autoSpeakReplies && !isMuted) {
+                    speakText(aiReply, undefined, assistantMessageId);
+                } else {
+                    updateStatus("idle");
+                }
+            } catch (err: unknown) {
+                const errorText =
+                    err instanceof Error
+                        ? err.message
+                        : "Connection error. Please verify your GROQ_API_KEY in .env.local.";
+
+                toast.error(errorText);
+
+                setMessages((prev) => [
+                    ...prev,
+                    {
+                        id: (Date.now() + 2).toString(),
+                        role: "assistant",
+                        content: `Error: ${errorText}`,
+                        time: formatTime(),
+                        model: selectedModel,
+                    },
+                ]);
+                updateStatus("idle");
+
+                if (isCallActiveRef.current) {
+                    setTimeout(() => {
+                        if (isCallActiveRef.current) startListening();
+                    }, 1500);
                 }
             }
+        },
+        [
+            messages,
+            selectedModel,
+            selectedPersona,
+            selectedLanguage,
+            autoSpeakReplies,
+            isMuted,
+            activeSessionId,
+            persistSessionToDB,
+            speakText,
+            startListening,
+            updateStatus,
+        ]
+    );
 
-            const aiMsgId = (Date.now() + 1).toString();
-            const aiMsg: Message = {
-                id: aiMsgId,
-                role: "assistant",
-                content: replyText,
-                time: getCurrentTime(),
-                model: actualModelUsed,
-                latency,
-            };
+    useEffect(() => {
+        sendMessageRef.current = sendMessage;
+    }, [sendMessage]);
 
-            const finalMessages = [...messagesRef.current, aiMsg];
-            messagesRef.current = finalMessages;
-            setMessages(finalMessages);
-
-            // Save conversation to MongoDB if logged in
-            persistMessagesToDB(finalMessages);
-
-            if (isVoice || isCallActiveRef.current || autoSpeakChat) {
-                speakText(replyText, aiMsgId);
-            } else {
-                setStatus("idle");
-            }
-        } catch {
-            const fallbackMsg: Message = {
-                id: (Date.now() + 1).toString(),
-                role: "assistant",
-                content:
-                    "Network error: Unable to reach the AI inference server. Please verify your internet connection.",
-                time: getCurrentTime(),
-            };
-
-            messagesRef.current = [...messagesRef.current, fallbackMsg];
-            setMessages([...messagesRef.current]);
-            setStatus("idle");
-        }
-    };
-
-    const regenerateLastResponse = () => {
-        if (status === "thinking" || messagesRef.current.length === 0) return;
-        const lastUserMessage = [...messagesRef.current]
-            .reverse()
-            .find((m) => m.role === "user");
-        if (!lastUserMessage) return;
-
-        if (
-            messagesRef.current[messagesRef.current.length - 1].role === "assistant"
-        ) {
-            messagesRef.current = messagesRef.current.slice(0, -1);
-            setMessages([...messagesRef.current]);
-        }
-        if (
-            messagesRef.current[messagesRef.current.length - 1]?.id ===
-            lastUserMessage.id
-        ) {
-            messagesRef.current = messagesRef.current.slice(0, -1);
-        }
-
-        sendMessageToAI(lastUserMessage.content, false);
-    };
-
-    const startCall = () => {
-        setOpenDropdown(null);
-        isCallActiveRef.current = true;
+    // Start Hands-Free Duplex Voice Call
+    const startVoiceCall = () => {
         setIsCallActive(true);
-        const welcomeText =
-            selectedLanguageRef.current.id === "ur-PK"
-                ? "Assalam o Alaikum! Nova AI voice line active hai. Aap baat shuru kar sakte hain."
-                : "Hello! Nova live voice session is active. How can I help you today?";
+        isCallActiveRef.current = true;
+        toast.success("Hands-Free Voice Call started! Speak after the greeting.");
 
-        const msgId = Date.now().toString();
-        const welcomeMsg: Message = {
-            id: msgId,
-            role: "assistant",
-            content: welcomeText,
-            time: getCurrentTime(),
-            model: selectedModelRef.current.name,
-        };
-        const updated = [...messagesRef.current, welcomeMsg];
-        messagesRef.current = updated;
-        setMessages(updated);
-        persistMessagesToDB(updated);
-        speakText(welcomeText, msgId);
+        const greeting =
+            "Hello! Nova live voice session is active. How can I help you today?";
+        const greetingId = Date.now().toString();
+
+        if (messages.length === 0) {
+            setMessages([
+                {
+                    id: greetingId,
+                    role: "assistant",
+                    content: greeting,
+                    time: formatTime(),
+                    model: selectedModel,
+                },
+            ]);
+        }
+
+        speakText(
+            greeting,
+            () => {
+                if (isCallActiveRef.current) {
+                    startListening();
+                }
+            },
+            greetingId
+        );
     };
 
-    const endCall = () => {
-        isCallActiveRef.current = false;
+    // End Voice Call
+    const endVoiceCall = () => {
         setIsCallActive(false);
-        setStatus("idle");
-        setSpeakingMessageId(null);
-        try {
-            recognitionRef.current?.stop();
-        } catch { }
-        if (typeof window !== "undefined" && "speechSynthesis" in window) {
-            window.speechSynthesis.cancel();
-        }
+        isCallActiveRef.current = false;
+        stopListening();
+        stopSpeaking();
+        updateStatus("idle");
+        toast("Voice Call ended.", { icon: "📞" });
     };
 
-    const toggleMute = () => {
-        const newMute = !isMuted;
-        setIsMuted(newMute);
-        isMutedRef.current = newMute;
-        if (
-            newMute &&
-            typeof window !== "undefined" &&
-            "speechSynthesis" in window
-        ) {
-            window.speechSynthesis.cancel();
-            setSpeakingMessageId(null);
-            setStatus("idle");
-        }
-    };
-
-    const handleTextSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!inputText.trim() || status === "thinking") return;
-        const text = inputText;
-        setInputText("");
-        sendMessageToAI(text, false);
-    };
-
-    const startNewChat = () => {
-        setActiveSessionId(null);
-        activeSessionIdRef.current = null;
+    // Start New Conversation
+    const startNewConversation = () => {
+        stopListening();
+        stopSpeaking();
         setMessages([]);
-        messagesRef.current = [];
-        if (typeof window !== "undefined" && "speechSynthesis" in window) {
-            window.speechSynthesis.cancel();
+        setActiveSessionId(null);
+        setInputText("");
+        setLiveTranscript("");
+        updateStatus("idle");
+        toast.success("Started a new conversation.");
+    };
+
+    // Load Saved Session from MongoDB
+    const handleSelectSession = (sessionId: string) => {
+        const found = sessions.find((s) => s._id === sessionId);
+        if (!found) return;
+        stopListening();
+        stopSpeaking();
+        setActiveSessionId(found._id);
+        setMessages(found.messages || []);
+        if (found.persona) setSelectedPersona(found.persona);
+        if (found.model && !found.model.toLowerCase().includes("allam")) {
+            setSelectedModel(found.model);
         }
-        setSpeakingMessageId(null);
-        setStatus("idle");
-        setOpenDropdown(null);
+        if (found.language) setSelectedLanguage(found.language);
+        toast.success(`Loaded "${found.title}"`);
     };
 
-    const handleSelectSession = (session: ChatSessionItem) => {
-        setActiveSessionId(session._id);
-        activeSessionIdRef.current = session._id;
-        setMessages(session.messages || []);
-        messagesRef.current = session.messages || [];
-    };
-
-    const handleDeleteSession = async (id: string, e: React.MouseEvent) => {
+    // Delete Saved Session from MongoDB
+    const handleDeleteSession = async (
+        sessionId: string,
+        e: React.MouseEvent
+    ) => {
         e.stopPropagation();
         try {
-            await fetch("/api/sessions?id=" + encodeURIComponent(id), {
-                method: "DELETE",
-            });
-            setSessions((prev) => prev.filter((s) => s._id !== id));
-            if (activeSessionIdRef.current === id) {
-                startNewChat();
+            await fetch(`/api/sessions?id=${sessionId}`, { method: "DELETE" });
+            setSessions((prev) => prev.filter((s) => s._id !== sessionId));
+            if (activeSessionId === sessionId) {
+                setMessages([]);
+                setActiveSessionId(null);
             }
-        } catch { }
+            toast.success("Conversation deleted.");
+        } catch {
+            toast.error("Failed to delete conversation.");
+        }
     };
 
+    // Logout Handler
     const handleLogout = async () => {
-        try {
-            await fetch("/api/auth", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ action: "logout" }),
-            });
-            setUser(null);
-            setSessions([]);
-            startNewChat();
-        } catch { }
+        await fetch("/api/auth", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "logout" }),
+        });
+        setUser(null);
+        setSessions([]);
+        setActiveSessionId(null);
+        setMessages([]);
+        toast.success("Signed out successfully.");
     };
 
-    const exportChatTranscript = () => {
-        if (messages.length === 0) return;
-        const transcript = messages
-            .map((m) => "[" + m.time + "] " + m.role.toUpperCase() + ": " + m.content)
-            .join("\n\n");
-        const blob = new Blob([transcript], { type: "text/plain;charset=utf-8" });
+    // Copy Message Content
+    const copyMessage = (id: string, content: string) => {
+        navigator.clipboard.writeText(content);
+        setCopiedId(id);
+        toast.success("Copied to clipboard!");
+        setTimeout(() => setCopiedId(null), 2000);
+    };
+
+    // Export Transcript
+    const exportTranscript = () => {
+        if (messages.length === 0) {
+            toast.error("No messages to export yet.");
+            return;
+        }
+        const text = messages
+            .map(
+                (m) => `[${m.time}] ${m.role.toUpperCase()}:\n${m.content}\n`
+            )
+            .join("\n----------------------------------------\n");
+        const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download =
-            "nova-ai-transcript-" + new Date().toISOString().slice(0, 10) + ".txt";
+        a.download = `nova-ai-transcript-${new Date()
+            .toISOString()
+            .slice(0, 10)}.txt`;
         a.click();
         URL.revokeObjectURL(url);
         setOpenDropdown(null);
+        toast.success("Transcript downloaded!");
     };
 
-    const copyMessage = (id: string, text: string) => {
-        navigator.clipboard.writeText(text);
-        setCopiedId(id);
-        setTimeout(() => setCopiedId(null), 1500);
+    // Regenerate Assistant Response
+    const regenerateResponse = (index: number) => {
+        const previousUserMessage = [...messages]
+            .slice(0, index)
+            .reverse()
+            .find((m) => m.role === "user");
+        if (!previousUserMessage) return;
+        setMessages((prev) => prev.slice(0, index));
+        sendMessage(previousUserMessage.content);
+    };
+
+    // Form Submit
+    const handleFormSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!inputText.trim() || status === "thinking") return;
+        stopListening();
+        sendMessage(inputText);
     };
 
     return (
-        <div className="flex h-screen w-screen overflow-hidden bg-linear-to-br from-slate-900 via-indigo-950/90 to-slate-900 text-slate-100">
-            <AuthModal
-                isOpen={isAuthModalOpen}
-                onClose={() => setIsAuthModalOpen(false)}
-                onSuccess={(loggedInUser) => {
-                    setUser(loggedInUser);
-                    fetchUserSessions();
-                }}
-            />
+        <div className="relative flex h-screen w-screen overflow-hidden bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 text-slate-100">
+            {/* Ambient Background Glow */}
+            <div className="pointer-events-none fixed inset-0 overflow-hidden z-0">
+                <div className="absolute -top-40 -left-40 w-96 h-96 bg-indigo-600/20 rounded-full blur-[120px]" />
+                <div className="absolute top-1/3 -right-32 w-96 h-96 bg-purple-600/15 rounded-full blur-[130px]" />
+                <div className="absolute -bottom-40 left-1/3 w-96 h-96 bg-blue-600/15 rounded-full blur-[120px]" />
+            </div>
 
+            {/* Collapsible Left Sidebar */}
             <Sidebar
-                isOpen={isSidebarOpen}
-                onClose={() => setIsSidebarOpen(false)}
-                onNewChat={startNewChat}
+                isSidebarOpen={isSidebarOpen}
+                setIsSidebarOpen={setIsSidebarOpen}
                 selectedPersona={selectedPersona}
-                onSelectPersona={setSelectedPersona}
+                setSelectedPersona={(id) => {
+                    setSelectedPersona(id);
+                    const p = PERSONAS.find((item) => item.id === id);
+                    if (p) toast.success(`Switched to ${p.name}`);
+                }}
                 selectedModel={selectedModel}
                 selectedLanguage={selectedLanguage}
-                user={user}
-                onOpenAuth={() => setIsAuthModalOpen(true)}
-                onLogout={handleLogout}
+                onNewConversation={startNewConversation}
                 sessions={sessions}
                 activeSessionId={activeSessionId}
                 onSelectSession={handleSelectSession}
                 onDeleteSession={handleDeleteSession}
+                user={user}
+                onLogout={handleLogout}
             />
 
-            <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
+            {/* Main Full-Screen Workspace */}
+            <div className="relative z-10 flex-1 flex flex-col h-full min-w-0 overflow-hidden">
+                {/* Top Navigation Bar */}
                 <TopNavbar
-                    headerRef={headerRef}
                     isSidebarOpen={isSidebarOpen}
-                    onOpenSidebar={() => setIsSidebarOpen(true)}
-                    models={models}
-                    selectedModel={selectedModel}
-                    onSelectModel={setSelectedModel}
-                    selectedPersona={selectedPersona}
-                    onSelectPersona={setSelectedPersona}
-                    selectedLanguage={selectedLanguage}
-                    onSelectLanguage={setSelectedLanguage}
+                    setIsSidebarOpen={setIsSidebarOpen}
                     openDropdown={openDropdown}
                     setOpenDropdown={setOpenDropdown}
-                    status={status}
-                    isMuted={isMuted}
-                    onToggleMute={toggleMute}
+                    dropdownContainerRef={dropdownContainerRef}
+                    availableModels={availableModels}
+                    currentModel={currentModel}
+                    selectedModel={selectedModel}
+                    setSelectedModel={(id) => {
+                        setSelectedModel(id);
+                        toast.success(`Model set to ${id}`);
+                    }}
+                    currentPersona={currentPersona}
+                    selectedPersona={selectedPersona}
+                    setSelectedPersona={(id) => {
+                        setSelectedPersona(id);
+                        const p = PERSONAS.find((item) => item.id === id);
+                        if (p) toast.success(`Persona set to ${p.name}`);
+                    }}
+                    currentLanguage={currentLanguage}
+                    selectedLanguage={selectedLanguage}
+                    setSelectedLanguage={(code) => {
+                        setSelectedLanguage(code);
+                        const l = LANGUAGES.find((item) => item.code === code);
+                        if (l) toast.success(`Language set to ${l.label}`);
+                    }}
                     speechRate={speechRate}
-                    onSelectSpeechRate={setSpeechRate}
-                    autoSpeakChat={autoSpeakChat}
-                    onToggleAutoSpeak={() => setAutoSpeakChat(!autoSpeakChat)}
-                    onExportTranscript={exportChatTranscript}
-                    onClearChat={startNewChat}
-                    hasMessages={messages.length > 0}
+                    setSpeechRate={setSpeechRate}
+                    autoSpeakReplies={autoSpeakReplies}
+                    setAutoSpeakReplies={setAutoSpeakReplies}
+                    isMuted={isMuted}
+                    setIsMuted={setIsMuted}
                     isCallActive={isCallActive}
-                    onStartCall={startCall}
-                    onEndCall={endCall}
+                    onStartVoiceCall={startVoiceCall}
+                    onEndVoiceCall={endVoiceCall}
+                    onExportTranscript={exportTranscript}
+                    onClearConversation={() => {
+                        startNewConversation();
+                        setOpenDropdown(null);
+                    }}
+                    onStopSpeaking={stopSpeaking}
                     user={user}
-                    onOpenAuth={() => setIsAuthModalOpen(true)}
                 />
 
+                {/* Active Voice Call Status Banner */}
                 <VoiceCallBanner
                     isCallActive={isCallActive}
                     selectedLanguage={selectedLanguage}
                     status={status}
-                    onStopSpeaking={stopSpeaking}
+                    liveTranscript={liveTranscript}
+                    onInterruptSpeech={() => {
+                        stopSpeaking();
+                        startListening();
+                    }}
+                    onForceSendTranscript={handleForceSendTranscript}
                 />
 
+                {/* Chat Stream & Welcome Quick Prompts */}
                 <MessageList
                     messages={messages}
                     status={status}
-                    selectedModel={selectedModel}
-                    selectedPersona={selectedPersona}
+                    currentPersona={currentPersona}
+                    currentModel={currentModel}
                     speakingMessageId={speakingMessageId}
                     copiedId={copiedId}
-                    chatEndRef={chatEndRef}
-                    onSendQuickPrompt={(prompt) => sendMessageToAI(prompt, false)}
-                    onSpeakText={speakText}
+                    messagesEndRef={messagesEndRef}
+                    onSendMessage={sendMessage}
+                    onSpeakMessage={(id, content) => speakText(content, undefined, id)}
                     onStopSpeaking={stopSpeaking}
-                    onRegenerate={regenerateLastResponse}
+                    onRegenerateResponse={regenerateResponse}
                     onCopyMessage={copyMessage}
                 />
 
+                {/* Bottom Composer Dock */}
                 <ChatComposer
                     inputText={inputText}
                     setInputText={setInputText}
-                    onSubmit={handleTextSubmit}
-                    isDictating={isDictating}
-                    onToggleDictation={toggleDictation}
                     status={status}
-                    selectedPersona={selectedPersona}
-                    selectedModel={selectedModel}
+                    currentPersona={currentPersona}
+                    currentModel={currentModel}
+                    onSubmit={handleFormSubmit}
+                    onStartListening={startListening}
+                    onStopListening={stopListening}
                 />
             </div>
         </div>
