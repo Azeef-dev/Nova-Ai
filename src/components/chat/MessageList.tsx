@@ -54,7 +54,7 @@ export default function MessageList({
             <div className="max-w-4xl mx-auto space-y-6">
                 {messages.length === 0 ? (
                     <div className="min-h-[60vh] flex flex-col items-center justify-center text-center py-8">
-                        <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-3xl bg-gradient-to-tr from-indigo-500/25 to-violet-500/25 border border-indigo-400/30 flex items-center justify-center mb-4 sm:mb-5 shadow-xl shadow-indigo-950/50">
+                        <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-3xl bg-linear-to-tr from-indigo-500/25 to-violet-500/25 border border-indigo-400/30 flex items-center justify-center mb-4 sm:mb-5 shadow-xl shadow-indigo-950/50">
                             <Bot className="w-7 h-7 sm:w-8 sm:h-8 text-indigo-300" />
                         </div>
                         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 mb-3">
@@ -120,11 +120,11 @@ export default function MessageList({
 
                                 <div
                                     className={`group relative max-w-[88%] sm:max-w-[78%] rounded-2xl px-4 sm:px-5 py-3 sm:py-3.5 text-xs sm:text-sm leading-relaxed shadow-lg ${msg.role === "user"
-                                            ? "rounded-tr-sm bg-gradient-to-br from-indigo-600 to-violet-600 text-white"
+                                            ? "rounded-tr-sm bg-linear-to-br from-indigo-600 to-violet-600 text-white"
                                             : "rounded-tl-sm border border-slate-700/80 bg-slate-800/90 text-slate-100"
                                         }`}
                                 >
-                                    <p className="whitespace-pre-wrap break-words">{msg.content}</p>
+                                    <p className="whitespace-pre-wrap wrap-break-word">{msg.content}</p>
 
                                     <div
                                         className={`mt-2.5 pt-2 border-t flex flex-wrap items-center justify-between gap-2 text-[10px] sm:text-[11px] ${msg.role === "user"
@@ -135,7 +135,7 @@ export default function MessageList({
                                         <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                                             <span>{msg.time}</span>
                                             {msg.model && (
-                                                <span className="px-1.5 py-0.5 rounded bg-slate-900/80 text-indigo-300 text-[9px] sm:text-[10px] font-medium truncate max-w-[120px]">
+                                                <span className="px-1.5 py-0.5 rounded bg-slate-900/80 text-indigo-300 text-[9px] sm:text-[10px] font-medium truncate max-w-30">
                                                     {msg.model}
                                                 </span>
                                             )}
