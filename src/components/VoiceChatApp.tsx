@@ -525,7 +525,7 @@ export default function VoiceChatApp() {
                     content: aiReply,
                     time: formatTime(),
                     model: usedModel,
-                    latencyMs,
+                    latency: String(latencyMs),
                 };
 
                 const finalMessages = [...updatedMessages, assistantMessage];
@@ -845,28 +845,36 @@ export default function VoiceChatApp() {
                 <MessageList
                     messages={messages}
                     status={status}
-                    currentPersona={currentPersona}
-                    currentModel={currentModel}
+                    selectedModel={currentModel}
+                    selectedPersona={currentPersona}
                     speakingMessageId={speakingMessageId}
                     copiedId={copiedId}
-                    messagesEndRef={messagesEndRef}
-                    onSendMessage={sendMessage}
-                    onSpeakMessage={(id, content) => speakText(content, undefined, id)}
+                    chatEndRef={messagesEndRef}
+                    onSendQuickPrompt={(prompt) => sendMessage(prompt)}
+                    onSpeakText={(content, id) => speakText(content, undefined, id)}
                     onStopSpeaking={stopSpeaking}
-                    onRegenerateResponse={regenerateResponse}
+                    onRegenerate={() => {
+                        for (let i = messages.length - 1; i >= 0; i--) {
+                            if (messages[i].role === "assistant") {
+                                regenerateResponse(i);
+                                break;
+                            }
+                        }
+                    }}
                     onCopyMessage={copyMessage}
                 />
+                <div ref={messagesEndRef} />
 
                 {/* Bottom Composer Dock */}
                 <ChatComposer
                     inputText={inputText}
                     setInputText={setInputText}
                     status={status}
-                    currentPersona={currentPersona}
-                    currentModel={currentModel}
                     onSubmit={handleFormSubmit}
-                    onStartListening={startListening}
-                    onStopListening={stopListening}
+                    isDictating={false}
+                    onToggleDictation={() => { }}
+                    selectedPersona={currentPersona}
+                    selectedModel={currentModel}
                 />
             </div>
         </div>
