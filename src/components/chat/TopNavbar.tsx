@@ -117,7 +117,7 @@ export default function TopNavbar({
                         className="px-2.5 sm:px-3 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-indigo-500/25 text-xs font-medium text-slate-200 flex items-center gap-1.5 transition-all cursor-pointer"
                     >
                         <Cpu className="w-4 h-4 text-indigo-400 shrink-0" />
-                        <span className="truncate max-w-[90px] sm:max-w-[130px] md:max-w-[160px]">
+                        <span className="truncate max-w-22.5 sm:max-w-32.5 md:max-w-40">
                             {currentModel.name}
                         </span>
                         <span className="hidden xl:inline-block text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shrink-0">
@@ -193,7 +193,7 @@ export default function TopNavbar({
                         <span className="text-indigo-400 shrink-0">
                             <currentPersona.icon className="w-4 h-4" />
                         </span>
-                        <span className="hidden md:inline truncate max-w-[120px]">
+                        <span className="hidden md:inline truncate max-w-30">
                             {currentPersona.name}
                         </span>
                         <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
@@ -254,7 +254,7 @@ export default function TopNavbar({
                         className="px-2.5 sm:px-3 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-indigo-500/25 text-xs font-medium text-slate-200 flex items-center gap-1.5 transition-all cursor-pointer"
                     >
                         <Globe className="w-4 h-4 text-indigo-400 shrink-0" />
-                        <span className="hidden sm:inline truncate max-w-[90px]">
+                        <span className="hidden sm:inline truncate max-w-22.5">
                             {currentLanguage.name}
                         </span>
                         <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
@@ -312,7 +312,7 @@ export default function TopNavbar({
                 ) : (
                     <div className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-medium shrink-0">
                         <UserCheck className="w-3.5 h-3.5" />
-                        <span className="truncate max-w-[110px]">{user.name}</span>
+                        <span className="truncate max-w-27.5">{user.name}</span>
                     </div>
                 )}
 
@@ -426,7 +426,7 @@ export default function TopNavbar({
                     <button
                         type="button"
                         onClick={onStartVoiceCall}
-                        className="px-3 sm:px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-xs shadow-lg shadow-emerald-600/25 flex items-center gap-1.5 sm:gap-2 transition-all cursor-pointer active:scale-95 shrink-0"
+                        className="px-3 sm:px-3.5 py-2.5 rounded-xl bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-xs shadow-lg shadow-emerald-600/25 flex items-center gap-1.5 sm:gap-2 transition-all cursor-pointer active:scale-95 shrink-0"
                     >
                         <PhoneCall className="w-4 h-4 shrink-0" />
                         <span className="hidden sm:inline">Start Voice Call</span>
@@ -436,7 +436,7 @@ export default function TopNavbar({
                     <button
                         type="button"
                         onClick={onEndVoiceCall}
-                        className="px-3 sm:px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-semibold text-xs shadow-lg shadow-rose-600/30 flex items-center gap-1.5 sm:gap-2 transition-all cursor-pointer animate-pulse shrink-0"
+                        className="px-3 sm:px-3.5 py-2.5 rounded-xl bg-linear-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-semibold text-xs shadow-lg shadow-rose-600/30 flex items-center gap-1.5 sm:gap-2 transition-all cursor-pointer animate-pulse shrink-0"
                     >
                         <PhoneOff className="w-4 h-4 shrink-0" />
                         <span>End Call</span>
